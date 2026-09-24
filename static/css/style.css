@@ -630,18 +630,19 @@ footer {
 /* Mobile Screens and Tablets (max-width: 768px) */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 8px;
     }
 
     .navbar {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
-        padding: 12px;
+        gap: 10px;
+        padding: 10px;
     }
 
     .navbar-brand {
         text-align: center;
+        font-size: 18px;
     }
 
     .navbar-nav {
@@ -649,15 +650,15 @@ footer {
         flex-wrap: wrap;
         justify-content: center;
         width: 100%;
-        gap: 6px;
+        gap: 4px;
     }
 
     .navbar-nav li {
-        margin: 2px 0;
+        margin: 2px;
     }
 
     .navbar-nav a {
-        padding: 6px 10px;
+        padding: 7px 10px;
         font-size: 12px;
     }
 
@@ -673,23 +674,34 @@ footer {
     .top-filter-bar {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: 10px;
     }
 
     .top-filter-bar form {
         width: 100%;
         display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
     }
 
     .top-filter-bar form input[type="text"] {
         flex: 1;
+        min-width: 140px;
         width: auto !important;
     }
 
     /* Product Grid */
     .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+
+    .product-card {
+        padding: 8px !important;
+    }
+
+    .product-card img {
+        height: 120px !important;
     }
 
     /* Single Product Details */
@@ -700,35 +712,104 @@ footer {
     /* Checkout Page */
     .checkout-layout {
         flex-direction: column;
+        gap: 15px;
+    }
+
+    .checkout-address-col,
+    .checkout-summary-col {
+        width: 100% !important;
+        padding: 0 !important;
     }
 
     /* Account Dashboard */
     .account-banner {
         flex-direction: column;
         align-items: flex-start;
-        padding: 14px;
+        padding: 12px;
     }
 
     .account-nav-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .account-nav-bar {
-        font-size: 12px;
-        padding: 8px 10px;
-        gap: 8px;
+        font-size: 11px;
+        padding: 6px 8px;
+        gap: 6px;
+        flex-wrap: wrap;
     }
 
-    /* Tables */
+    /* Tables & Responsive Wrapper */
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: block !important;
+        margin-bottom: 15px;
+    }
+
     .table-responsive table {
-        min-width: 520px;
+        min-width: 480px;
+    }
+
+    /* Responsive Form Tables - stack rows vertically on small screens */
+    table.form-table,
+    form table {
+        width: 100% !important;
+    }
+
+    table.form-table tr,
+    form table tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 8px;
+    }
+
+    table.form-table td,
+    form table td {
+        display: block;
+        width: 100% !important;
+        padding: 3px 0 !important;
+        box-sizing: border-box;
+    }
+
+    /* Inputs full width */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* All containers with hardcoded max-widths fill mobile viewport */
+    div[style*="max-width: 450px"],
+    div[style*="max-width: 480px"],
+    div[style*="max-width: 500px"],
+    div[style*="max-width: 600px"],
+    div[style*="max-width: 650px"],
+    div[style*="max-width: 750px"],
+    div[style*="max-width: 800px"],
+    div[style*="width: 60%"],
+    div[style*="width: 70%"],
+    .invoice-box,
+    .success-container,
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 10px auto !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
     }
 }
 
 /* Small Smart Phones (max-width: 480px) */
 @media (max-width: 480px) {
     body {
-        padding: 8px;
+        padding: 6px;
     }
 
     .product-grid {
@@ -736,16 +817,24 @@ footer {
     }
 
     .auth-card {
-        padding: 16px;
+        padding: 14px;
         border-radius: 4px;
     }
 
-    div[style*="max-width: 450px"],
-    div[style*="max-width: 480px"],
-    div[style*="max-width: 500px"],
-    div[style*="max-width: 600px"] {
-        padding: 15px !important;
-        margin: 10px auto !important;
-        width: 100% !important;
+    .navbar-brand {
+        font-size: 16px;
+    }
+
+    .navbar-nav a {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    /* Make buttons easy to tap on small screens */
+    button,
+    input[type="submit"],
+    input[type="button"] {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 }

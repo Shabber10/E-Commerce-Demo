@@ -1,10 +1,25 @@
 import os
-import mysql.connector
-from mysql.connector import Error
+import re
+import sqlite3
+
+from datetime import datetime
+
+try:
+    import mysql.connector
+    from mysql.connector import Error as MySQLError
+except ImportError:
+    mysql = None
+    MySQLError = Exception
 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'super-secret-key-change-in-production-ecommerce-2026')
+
+    # Database Engine Selection: 'sqlite' (default, portable, Netlify/Render friendly) or 'mysql'
+    DB_ENGINE = os.environ.get('DB_ENGINE', 'sqlite').lower()
+    SQLITE_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'smartcart.db')
+
+    # MySQL Configuration (fallback / optional)
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
     DB_USER = os.environ.get('DB_USER', 'root')
     DB_PASSWORD = os.environ.get('DB_PASSWORD', 'shabber')
@@ -27,68 +42,197 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'shabber12396@gmail.com')
 
 
+# =============================================================
+# SQLite COMPATIBILITY LAYER FOR FLASK
+# Provides standard cursor(dictionary=True) and translates %s -> ?
+# =============================================================
+class SQLiteCursorWrapper:
+    """Wraps sqlite3.Cursor to provide MySQL-compatible %s placeholder and dictionary results."""
+    def __init__(self, cursor, dictionary=False):
+        self._cursor = cursor
+        self.dictionary = dictionary
+
+    def _translate(self, sql):
+        if not sql:
+            return sql
+        # Translate MySQL INSERT IGNORE -> SQLite INSERT OR IGNORE
+        sql = sql.replace('INSERT IGNORE INTO', 'INSERT OR IGNORE INTO')
+        
+        # Translate ON DUPLICATE KEY UPDATE for cart_items and inventory
+        if 'cart_items' in sql and 'ON DUPLICATE KEY UPDATE' in sql:
+            sql = re.sub(
+                r'ON DUPLICATE KEY UPDATE.*',
+                'ON CONFLICT(cart_id, product_id) DO UPDATE SET quantity = quantity + excluded.quantity',
+                sql,
+                flags=re.IGNORECASE
+            )
+        elif 'inventory' in sql and 'ON DUPLICATE KEY UPDATE' in sql:
+            sql = re.sub(
+                r'ON DUPLICATE KEY UPDATE.*',
+                'ON CONFLICT(product_id) DO UPDATE SET quantity = excluded.quantity',
+                sql,
+                flags=re.IGNORECASE
+            )
+
+        # Replace MySQL GREATEST with SQLite MAX
+        sql = re.sub(r'\bGREATEST\b', 'MAX', sql, flags=re.IGNORECASE)
+
+        # Replace MySQL placeholder %s with SQLite placeholder ?
+        sql = sql.replace('%s', '?')
+        return sql
+
+    def execute(self, sql, params=None):
+        tsql = self._translate(sql)
+        if params is not None:
+            return self._cursor.execute(tsql, tuple(params))
+        return self._cursor.execute(tsql)
+
+    def _parse_row(self, row):
+        if row is None:
+            return None
+        d = dict(row) if self.dictionary else row
+        if isinstance(d, dict):
+            for k, v in list(d.items()):
+                if isinstance(v, str) and (k.endswith('_date') or k.endswith('_at') or k == 'created_at' or k == 'updated_at' or k == 'payment_date' or k == 'order_date'):
+                    try:
+                        # Clean sqlite timestamp string: '2026-09-24 05:17:19'
+                        clean_ts = v.replace('T', ' ')[:19]
+                        d[k] = datetime.strptime(clean_ts, '%Y-%m-%d %H:%M:%S')
+                    except Exception:
+                        pass
+        return d
+
+    def fetchone(self):
+        row = self._cursor.fetchone()
+        if row is None:
+            return None
+        return self._parse_row(row)
+
+    def fetchall(self):
+        rows = self._cursor.fetchall()
+        return [self._parse_row(r) for r in rows]
+
+    @property
+    def lastrowid(self):
+        return self._cursor.lastrowid
+
+    @property
+    def rowcount(self):
+        return self._cursor.rowcount
+
+    def close(self):
+        try:
+            return self._cursor.close()
+        except Exception:
+            pass
+
+
+class SQLiteConnectionWrapper:
+    """Wraps sqlite3.Connection to provide .cursor(dictionary=True)."""
+    def __init__(self, conn):
+        self._conn = conn
+
+    def cursor(self, dictionary=False):
+        return SQLiteCursorWrapper(self._conn.cursor(), dictionary=dictionary)
+
+    def commit(self):
+        return self._conn.commit()
+
+    def rollback(self):
+        return self._conn.rollback()
+
+    def close(self):
+        return self._conn.close()
+
+
 def db_connection():
-    """Returns a MySQL connection to the e_commerce database."""
-    try:
-        conn = mysql.connector.connect(
-            host=Config.DB_HOST,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD,
-            database=Config.DB_NAME
-        )
-        return conn
-    except Error as err:
-        print(f"Database connection error: {err}")
-        return None
+    """Returns an active database connection (SQLite by default, or MySQL)."""
+    if Config.DB_ENGINE == 'sqlite':
+        try:
+            conn = sqlite3.connect(Config.SQLITE_DB_PATH, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            return SQLiteConnectionWrapper(conn)
+        except Exception as err:
+            print(f"SQLite database connection error: {err}")
+            return None
+    else:
+        # MySQL connection
+        if not mysql:
+            print("mysql-connector is not installed, falling back to SQLite.")
+            return sqlite3.connect(Config.SQLITE_DB_PATH)
+        try:
+            conn = mysql.connector.connect(
+                host=Config.DB_HOST,
+                user=Config.DB_USER,
+                password=Config.DB_PASSWORD,
+                database=Config.DB_NAME
+            )
+            return conn
+        except MySQLError as err:
+            print(f"MySQL connection error: {err}")
+            return None
 
 
 def init_db():
-    """Creates database and required tables using db/schema.sql if they don't exist yet."""
-    try:
-        # Step 1: Connect to server without database to ensure database exists
-        server_conn = mysql.connector.connect(
-            host=Config.DB_HOST,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD
-        )
-        cursor = server_conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
-        cursor.close()
-        server_conn.close()
+    """Initializes the database schema and sample data on startup."""
+    if Config.DB_ENGINE == 'sqlite':
+        try:
+            schema_file = os.path.join(os.path.dirname(__file__), 'db', 'schema_sqlite.sql')
+            if not os.path.exists(schema_file):
+                schema_file = os.path.join(os.path.dirname(__file__), 'db', 'schema.sql')
 
-        # Step 2: Connect to the database and execute schema.sql
-        conn = db_connection()
-        if not conn:
-            print("Failed to connect to database for table creation.")
-            return False
-
-        cursor = conn.cursor()
-        schema_file = os.path.join(os.path.dirname(__file__), 'db', 'schema.sql')
-        if os.path.exists(schema_file):
-            with open(schema_file, 'r', encoding='utf-8') as f:
-                sql_content = f.read()
-
-            statements = [s.strip() for s in sql_content.split(';') if s.strip()]
-            for stmt in statements:
-                lines = [line for line in stmt.splitlines() if not line.strip().startswith('--')]
-                clean_stmt = '\n'.join(lines).strip()
-                if clean_stmt:
-                    try:
-                        cursor.execute(clean_stmt)
-                    except Error as e:
-                        # Ignore benign warnings/skips
-                        pass
+            conn = sqlite3.connect(Config.SQLITE_DB_PATH)
+            if os.path.exists(schema_file):
+                with open(schema_file, 'r', encoding='utf-8') as f:
+                    conn.executescript(f.read())
             conn.commit()
-            print("Database schema verified and loaded successfully.")
-        else:
-            print("Warning: db/schema.sql not found.")
+            conn.close()
+            print(f"SQLite database initialized successfully at: {Config.SQLITE_DB_PATH}")
+            return True
+        except Exception as err:
+            print(f"SQLite initialization error: {err}")
+            return False
+    else:
+        # MySQL initialization
+        if not mysql:
+            return False
+        try:
+            server_conn = mysql.connector.connect(
+                host=Config.DB_HOST,
+                user=Config.DB_USER,
+                password=Config.DB_PASSWORD
+            )
+            cursor = server_conn.cursor()
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+            cursor.close()
+            server_conn.close()
 
-        cursor.close()
-        conn.close()
-        return True
-    except Error as err:
-        print(f"Database initialization error: {err}")
-        return False
+            conn = db_connection()
+            if not conn:
+                return False
+
+            cursor = conn.cursor()
+            schema_file = os.path.join(os.path.dirname(__file__), 'db', 'schema.sql')
+            if os.path.exists(schema_file):
+                with open(schema_file, 'r', encoding='utf-8') as f:
+                    sql_content = f.read()
+                statements = [s.strip() for s in sql_content.split(';') if s.strip()]
+                for stmt in statements:
+                    lines = [line for line in stmt.splitlines() if not line.strip().startswith('--')]
+                    clean_stmt = '\n'.join(lines).strip()
+                    if clean_stmt:
+                        try:
+                            cursor.execute(clean_stmt)
+                        except Exception:
+                            pass
+                conn.commit()
+                print("MySQL database schema verified and loaded.")
+            cursor.close()
+            conn.close()
+            return True
+        except Exception as err:
+            print(f"MySQL initialization error: {err}")
+            return False
 
 
 if __name__ == '__main__':
