@@ -1776,6 +1776,69 @@ def checkout():
         return redirect(url_for('cart_view'))
 
 
+@app.route('/create-razorpay-order', methods=['POST'])
+@login_required
+def create_razorpay_order():
+    """
+    Step 1 of Razorpay Integration:
+    Creates an authentic order on Razorpay servers and returns order_id, amount in paise, currency, and key_id.
+    """
+    customer_id = session.get('user_id')
+    cart_id = get_or_create_cart(customer_id)
+
+    conn = db_connection()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database error'}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT ci.quantity, p.price
+            FROM cart_items ci
+            JOIN products p ON ci.product_id = p.product_id
+            WHERE ci.cart_id = %s
+        """, (cart_id,))
+        items = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if not items:
+            return jsonify({'success': False, 'error': 'Cart is empty'}), 400
+
+        total_amount = sum(float(it['price']) * it['quantity'] for it in items)
+        amount_in_paise = int(round(total_amount * 100))
+
+        key_id = Config.RAZORPAY_KEY_ID
+        key_secret = Config.RAZORPAY_KEY_SECRET
+
+        if not key_id or key_id.startswith('rzp_test_eCommerce'):
+            return jsonify({
+                'success': False,
+                'is_dummy_key': True,
+                'error': 'Please enter your real Razorpay Key ID and Secret in config.py to connect to Razorpay.'
+            }), 400
+
+        client = razorpay.Client(auth=(key_id, key_secret))
+        order_params = {
+            'amount': amount_in_paise,
+            'currency': 'INR',
+            'receipt': f'rcpt_{customer_id}_{int(datetime.now().timestamp())}',
+            'payment_capture': 1
+        }
+        rzp_order = client.order.create(order_params)
+
+        return jsonify({
+            'success': True,
+            'order_id': rzp_order['id'],
+            'amount': rzp_order['amount'],
+            'currency': rzp_order['currency'],
+            'key': key_id,
+            'total_rupees': total_amount
+        })
+    except Exception as err:
+        return jsonify({'success': False, 'error': str(err)}), 500
+
+
 @app.route('/payment/process', methods=['POST'])
 @login_required
 def payment_process():

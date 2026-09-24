@@ -296,56 +296,82 @@ function submitCODPayment() {
     document.getElementById('checkout-form').submit();
 }
 
-// 3. Official Razorpay Gateway Trigger
-document.getElementById('launch-razorpay-btn').onclick = function(e) {
+// 3. Official Razorpay Gateway Trigger (Exact Step-by-Step Flow from Razorpay Docs)
+document.getElementById('launch-razorpay-btn').onclick = async function(e) {
     e.preventDefault();
     if (!validateAddress()) return;
 
-    var rzpKey = "{{ razorpay_key_id }}";
-    var rzpOrderId = "{{ razorpay_order_id }}";
-    var amountPaise = {{ amount_in_paise }};
-
-    var options = {
-        "key": rzpKey,
-        "amount": amountPaise,
-        "currency": "INR",
-        "name": "E-Commerce Demo",
-        "description": "Order Payment",
-        "prefill": {
-            "name": "{{ current_user.name }}",
-            "email": "{{ current_user.email }}",
-            "contact": document.getElementById('phone_number').value.trim()
-        },
-        "theme": {
-            "color": "#1a2332"
-        },
-        "handler": function (response) {
-            // ONLY executes if payment succeeded through Razorpay
-            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
-            document.getElementById('razorpay_order_id_input').value = response.razorpay_order_id || rzpOrderId;
-            document.getElementById('razorpay_signature_input').value = response.razorpay_signature || '';
-            document.getElementById('payment_method_input').value = 'Razorpay Gateway';
-            document.getElementById('checkout-form').submit();
-        },
-        "modal": {
-            "ondismiss": function() {
-                alert('Payment was cancelled or closed. No amount was debited and no order was placed.');
-            }
-        }
-    };
-
-    if (rzpOrderId) {
-        options.order_id = rzpOrderId;
-    }
+    var btn = this;
+    var origText = btn.innerHTML;
+    btn.innerHTML = 'Connecting to Razorpay...';
+    btn.disabled = true;
 
     try {
+        // Step 1: Request order creation from server backend
+        const res = await fetch('/create-razorpay-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            if (data.is_dummy_key) {
+                alert('Razorpay Merchant Key Required:\n\n' +
+                      'To use the official Razorpay Checkout popup, please enter your actual Razorpay Key ID and Secret from https://dashboard.razorpay.com/app/keys into config.py.\n\n' +
+                      'In the meantime, you can use the "UPI Dynamic QR" tab to pay directly to 970403****@fam!');
+            } else {
+                alert('Razorpay Error: ' + (data.error || 'Failed to create order'));
+            }
+            return;
+        }
+
+        // Step 2: Configure Razorpay Checkout options with received order_id
+        var options = {
+            "key": data.key,
+            "amount": data.amount,
+            "currency": data.currency,
+            "name": "E-Commerce Demo",
+            "description": "Order Payment",
+            "order_id": data.order_id,
+            "handler": function (response) {
+                // Step 3: Triggered ONLY when customer completes real payment
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_order_id_input').value = response.razorpay_order_id;
+                document.getElementById('razorpay_signature_input').value = response.razorpay_signature;
+                document.getElementById('payment_method_input').value = 'Razorpay Gateway';
+                document.getElementById('checkout-form').submit();
+            },
+            "prefill": {
+                "name": "{{ current_user.name }}",
+                "email": "{{ current_user.email }}",
+                "contact": document.getElementById('phone_number').value.trim()
+            },
+            "theme": {
+                "color": "#1a2332"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                    alert('Razorpay Checkout closed. No payment was debited and no order was placed.');
+                }
+            }
+        };
+
         var rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (response){
-            alert('Razorpay Payment Failed: ' + response.error.description + '\nReason: ' + response.error.reason);
+        rzp.on('payment.failed', function(resp) {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            alert('Razorpay Payment Failed: ' + resp.error.description);
         });
         rzp.open();
-    } catch(err) {
-        alert('Could not open Razorpay gateway (' + err.message + '). Please use the UPI Dynamic QR code option above to pay directly.');
+
+    } catch (err) {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+        alert('Network error connecting to payment gateway: ' + err.message);
     }
 };
 </script>
