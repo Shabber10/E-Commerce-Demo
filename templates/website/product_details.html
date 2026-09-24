@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name }} - E-Commerce Store{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<div class="account-nav-bar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span>&rsaquo;</span>
+    <a href="{{ url_for('index', category=product.category_id) }}">{{ product.category_name }}</a>
+    <span>&rsaquo;</span>
+    <span class="active">{{ product.product_name }}</span>
+</div>
+
+<!-- Product Details Container -->
+<div style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 25px; margin-bottom: 30px;">
+    <div class="product-detail-layout">
+        <!-- Left: Product Image -->
+        <div class="product-detail-image-col">
+            <div style="background-color: #fcfcfc; border: 1px solid #eee; border-radius: 6px; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 280px;">
+                {% if product.image_url %}
+                    <img 
+                        src="{{ url_for('uploaded_file', filename=product.image_url) }}" 
+                        alt="{{ product.product_name }}" 
+                        style="max-width: 100%; max-height: 280px; object-fit: contain;"
+                    >
+                {% else %}
+                    <span style="color: #999; font-size: 16px;">No Image Available</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right: Product Information & Purchase Action -->
+        <div class="product-detail-info-col">
+            <span style="display: inline-block; font-size: 12px; font-weight: bold; text-transform: uppercase; background-color: #e2e8f0; color: #2d3748; padding: 3px 8px; border-radius: 3px; margin-bottom: 8px;">
+                {{ product.category_name }}
+            </span>
+
+            <h1 style="font-size: 24px; margin: 8px 0 12px 0; color: #1a2332;">
+                {{ product.product_name }}
+            </h1>
+
+            <div style="font-size: 26px; font-weight: bold; color: #0c2340; margin-bottom: 12px;">
+                ₹{{ "%.2f"|format(product.price) }}
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                {% if product.stock_quantity > 0 %}
+                    <span style="color: #2e7d32; font-weight: bold; font-size: 14px;">
+                        &#10004; In Stock ({{ product.stock_quantity }} units available)
+                    </span>
+                {% else %}
+                    <span style="color: #c53030; font-weight: bold; font-size: 14px;">
+                        &#10008; Currently Out of Stock
+                    </span>
+                {% endif %}
+            </div>
+
+            <hr>
+
+            <!-- Product Description -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; margin-bottom: 6px;">Product Description:</h3>
+                <p style="font-size: 14px; color: #555; line-height: 1.6; margin: 0;">
+                    {{ product.description or 'No additional description provided for this product.' }}
+                </p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if product.stock_quantity > 0 %}
+                <form action="{{ url_for('cart_add', product_id=product.product_id) }}" method="POST" onsubmit="return addToCartAjax(event, this, {{ product.product_id }});" style="margin-top: 25px;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label style="font-weight: bold; font-size: 14px;">Quantity:</label>
+                        <input 
+                            type="number" 
+                            name="quantity" 
+                            value="1" 
+                            min="1" 
+                            max="{{ product.stock_quantity }}" 
+                            style="width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 4px;"
+                        >
+                        <button type="submit" style="padding: 10px 22px; font-size: 14px; font-weight: bold;">
+                            &#128722; Add to Shopping Cart
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div style="margin-top: 20px;">
+                    <button disabled style="padding: 10px 20px; font-size: 14px;">
+                        Out of Stock
+                    </button>
+                </div>
+            {% endif %}
+
+            <br>
+            <div style="margin-top: 15px; font-size: 13px;">
+                <a href="{{ url_for('index') }}">&larr; Continue Shopping / Back to Products</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCartAjax(event, formElement, productId) {
+    if (event) event.preventDefault();
+    var qtyInput = formElement ? formElement.querySelector('input[name="quantity"]') : null;
+    var quantity = qtyInput ? qtyInput.value : 1;
+    var btn = formElement ? formElement.querySelector('button[type="submit"]') : null;
+    var origText = btn ? btn.innerText : '';
+    if (btn) {
+        btn.innerText = 'Adding...';
+        btn.disabled = true;
+    }
+
+    fetch('/cart/add-ajax/' + productId + '?quantity=' + quantity)
+        .then(function(res) {
+            if (res.status === 401) {
+                window.location.href = "{{ url_for('login') }}?next=" + encodeURIComponent(window.location.pathname);
+                return null;
+            }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data) return;
+            if (data.success) {
+                var badge = document.getElementById("cart-count");
+                if (badge && data.cart_count !== undefined) {
+                    badge.innerText = data.cart_count;
+                }
+                showToast("✔ " + data.message);
+            } else {
+                alert(data.message || "Could not add product to cart.");
+            }
+        })
+        .catch(function(err) {
+            console.error("Cart AJAX error:", err);
+            if (formElement) formElement.submit();
+        })
+        .finally(function() {
+            if (btn) {
+                btn.innerText = origText;
+                btn.disabled = false;
+            }
+        });
+    return false;
+}
+
+function showToast(message) {
+    var toast = document.getElementById("cart-toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "cart-toast";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.backgroundColor = "#0c2340";
+        toast.style.color = "#ffffff";
+        toast.style.padding = "12px 20px";
+        toast.style.borderRadius = "4px";
+        toast.style.boxShadow = "0 3px 10px rgba(0,0,0,0.2)";
+        toast.style.zIndex = "99999";
+        toast.style.fontSize = "14px";
+        toast.style.fontWeight = "bold";
+        toast.style.transition = "opacity 0.3s ease";
+        document.body.appendChild(toast);
+    }
+    toast.innerText = message;
+    toast.style.display = "block";
+    toast.style.opacity = "1";
+    setTimeout(function() {
+        toast.style.opacity = "0";
+        setTimeout(function() { toast.style.display = "none"; }, 300);
+    }, 2500);
+}
+</script>
+{% endblock %}

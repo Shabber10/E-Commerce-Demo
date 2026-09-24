@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - E-Commerce Store{% endblock %}
+
+<!-- Account Navigation Bar -->
+<div class="account-nav-bar">
+    <a href="{{ url_for('dashboard') }}">&larr; Dashboard</a>
+    <span>|</span>
+    <a href="{{ url_for('index') }}">Browse Shop</a>
+    <span>|</span>
+    <span class="active"><b>My Orders &amp; Invoices</b></span>
+    <span>|</span>
+    <a href="{{ url_for('cart_view') }}">Shopping Cart</a>
+    <span>|</span>
+    <a href="{{ url_for('profile') }}">Profile Settings</a>
+    <span>|</span>
+    <a href="{{ url_for('updatepassword') }}">Change Password</a>
+</div>
+
+<h2>My Order History</h2>
+<hr>
+
+{% if orders %}
+    <div class="table-responsive">
+        <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse;">
+            <thead>
+                <tr bgcolor="#f0f0f0">
+                    <th width="140">Order #</th>
+                    <th width="120">Date</th>
+                    <th width="100">Total (₹)</th>
+                    <th width="120">Order Status</th>
+                    <th width="120">Payment</th>
+                    <th width="140">Invoice</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ord in orders %}
+                    <tr>
+                        <td align="center"><b>{{ ord.order_number }}</b></td>
+                        <td align="center">{{ ord.order_date.strftime('%d-%m-%Y %H:%M') if ord.order_date else '' }}</td>
+                        <td align="center"><b>₹{{ "%.2f"|format(ord.total_amount) }}</b></td>
+                        <td align="center">
+                            {% if ord.order_status == 'delivered' %}
+                                <span style="color: green; font-weight: bold;">Delivered</span>
+                            {% elif ord.order_status == 'shipped' %}
+                                <span style="color: blue;">Shipped</span>
+                            {% elif ord.order_status == 'processing' %}
+                                <span style="color: purple;">Processing</span>
+                            {% else %}
+                                <span>{{ ord.order_status|capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td align="center">
+                            {% if ord.payment_status == 'completed' %}
+                                <span style="color: green; font-weight: bold;">Paid</span>
+                            {% else %}
+                                <span>{{ ord.payment_status or 'Pending' }}</span>
+                            {% endif %}
+                        </td>
+                        <td align="center" style="white-space: nowrap;">
+                            <a href="{{ url_for('download_invoice', order_id=ord.order_id) }}" title="Download PDF Invoice">
+                                <button style="padding: 4px 8px; cursor: pointer; font-size: 12px; font-weight: bold; background-color: #0c2340; color: #fff; border: 1px solid #0c2340; border-radius: 3px;">
+                                    &#128196; PDF
+                                </button>
+                            </a>
+                            <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank" title="View / Print Tax Invoice">
+                                <button style="padding: 4px 8px; cursor: pointer; font-size: 12px; border: 1px solid #ccc; background-color: #f7f7f7; border-radius: 3px;">
+                                    Print
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>You have not placed any orders yet.</p>
+    <p><a href="{{ url_for('index') }}"><b>&raquo; Browse Products and Start Shopping</b></a></p>
+{% endif %}
+{% endblock %}

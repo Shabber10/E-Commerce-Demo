@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Order Placed Successfully - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 30px auto; padding: 25px; border: 2px solid #2e7d32; background-color: #f9fbf9; text-align: center;">
+    <h2 style="color: #2e7d32;">Payment Received &amp; Order Placed!</h2>
+    <p>Your payment via Razorpay has been processed successfully.</p>
+    <hr>
+    <br>
+
+    <table width="100%" cellpadding="8" style="text-align: left;">
+        <tr>
+            <td width="40%"><b>Order Number:</b></td>
+            <td>{{ order.order_number }}</td>
+        </tr>
+        <tr>
+            <td><b>Order Date:</b></td>
+            <td>{{ order.order_date.strftime('%d %B %Y, %I:%M %p') if order.order_date else '' }}</td>
+        </tr>
+        <tr>
+            <td><b>Payment ID (Razorpay):</b></td>
+            <td>{{ payment.transaction_id if payment else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td><b>Payment Status:</b></td>
+            <td><span style="color: green; font-weight: bold;">{{ (payment.payment_status if payment else 'Completed')|capitalize }}</span></td>
+        </tr>
+        <tr>
+            <td><b>Total Amount Paid:</b></td>
+            <td><b>₹{{ "%.2f"|format(order.total_amount) }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Delivery Address:</b></td>
+            <td>{{ address.address_line }}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}</td>
+        </tr>
+    </table>
+
+    <br><hr><br>
+
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('download_invoice', order_id=order.order_id) }}">
+            <button style="padding: 12px 22px; font-size: 14px; font-weight: bold; background-color: #0c2340; color: #fff; cursor: pointer; border: none; border-radius: 4px;">
+                &#128196; Download Invoice (PDF)
+            </button>
+        </a>
+        <a href="{{ url_for('order_invoice', order_id=order.order_id) }}" target="_blank">
+            <button style="padding: 12px 18px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #fff; border-radius: 4px;">
+                Print Invoice
+            </button>
+        </a>
+        <a href="{{ url_for('customer_orders') }}">
+            <button style="padding: 12px 18px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background-color: #fff; border-radius: 4px;">
+                View My Orders
+            </button>
+        </a>
+    </div>
+
+    <br>
+    <p><a href="{{ url_for('index') }}">&larr; Return to Shopping Catalog</a></p>
+</div>
+{% endblock %}

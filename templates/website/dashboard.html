@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - E-Commerce Store{% endblock %}
+
+{% block content %}
+<!-- User Profile Welcome Banner -->
+<div class="account-banner">
+    <div class="account-user-info">
+        <div>
+            {% if current_user.profile_image %}
+                <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #0c2340;">
+            {% else %}
+                <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 1px solid #ccc;">
+                    &#128100;
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h2 style="margin: 0 0 4px 0;">Welcome, {{ current_user.name }}!</h2>
+            <p style="margin: 0; color: #666; font-size: 13px;">Logged in as: <b>{{ current_user.email }}</b></p>
+            <div style="margin-top: 6px;">
+                <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background-color: {% if current_user.role == 'admin' %}#c53030{% else %}#2b6cb0{% endif %}; color: #ffffff;">
+                    Role: {{ current_user.role }}
+                </span>
+                <span style="font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 3px; background-color: #e8f5e9; color: #2e7d32; margin-left: 6px;">
+                    ● Active Account
+                </span>
+            </div>
+        </div>
+    </div>
+    <div>
+        <a href="{{ url_for('profile') }}">
+            <button type="button" style="padding: 8px 16px;">
+                &#9998; Edit Profile
+            </button>
+        </a>
+    </div>
+</div>
+
+<!-- Key Metrics Overview Table -->
+<h3>Account Overview</h3>
+<table width="100%" border="1" cellpadding="15" style="border-collapse: collapse; text-align: center; margin-bottom: 30px;">
+    <tr bgcolor="#f0f0f0">
+        <th width="33%">Items in Cart</th>
+        <th width="33%">Total Orders Placed</th>
+        <th width="33%">Account Status</th>
+    </tr>
+    <tr>
+        <td>
+            <h2 style="margin: 5px 0;">{{ cart_count }}</h2>
+            <a href="{{ url_for('cart_view') }}" style="font-size: 13px; font-weight: bold;">View Shopping Cart &rarr;</a>
+        </td>
+        <td>
+            <h2 style="margin: 5px 0;">{{ order_count }}</h2>
+            <a href="{{ url_for('customer_orders') }}" style="font-size: 13px; font-weight: bold;">View My Orders &rarr;</a>
+        </td>
+        <td>
+            <h2 style="margin: 5px 0; color: #2e7d32;">Active</h2>
+            <span style="font-size: 13px; color: #666;">Standard Permissions</span>
+        </td>
+    </tr>
+</table>
+
+<!-- Account Navigation & Quick Actions Section -->
+<h3>Account Navigation &amp; Quick Actions</h3>
+<p style="color: #666; font-size: 13px; margin-bottom: 12px;">Quickly navigate through your shopping and account settings:</p>
+
+<div class="account-nav-grid">
+    <!-- 1. Browse Catalog & Shop -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128717;</div>
+            <div class="account-card-title">Browse Catalog &amp; Shop</div>
+            <div class="account-card-desc">Explore products, search categories, and purchase items.</div>
+        </div>
+        <a href="{{ url_for('index') }}" class="account-card-btn">Shop Now &rarr;</a>
+    </div>
+
+    <!-- 2. View Shopping Cart -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128722;</div>
+            <div class="account-card-title">View Shopping Cart</div>
+            <div class="account-card-desc">Review your selected items ({{ cart_count }} items) and proceed to checkout.</div>
+        </div>
+        <a href="{{ url_for('cart_view') }}" class="account-card-btn">Open Cart ({{ cart_count }}) &rarr;</a>
+    </div>
+
+    <!-- 3. View Order History & Invoices -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128230;</div>
+            <div class="account-card-title">Order History &amp; Invoices</div>
+            <div class="account-card-desc">Track all your past orders and view or download official PDF invoices.</div>
+        </div>
+        <a href="{{ url_for('customer_orders') }}" class="account-card-btn">View Orders ({{ order_count }}) &rarr;</a>
+    </div>
+
+    <!-- 4. Profile Settings -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128100;</div>
+            <div class="account-card-title">Profile Settings</div>
+            <div class="account-card-desc">Update your personal contact details, mobile phone, and profile photo.</div>
+        </div>
+        <a href="{{ url_for('profile') }}" class="account-card-btn">Edit Profile &rarr;</a>
+    </div>
+
+    <!-- 5. Change Password -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128273;</div>
+            <div class="account-card-title">Change Password</div>
+            <div class="account-card-desc">Update your account login password to keep your account safe and secure.</div>
+        </div>
+        <a href="{{ url_for('updatepassword') }}" class="account-card-btn">Change Password &rarr;</a>
+    </div>
+
+    {% if current_user.role == 'admin' %}
+    <!-- 6. Admin Panel -->
+    <div class="account-card" style="border-left: 4px solid #c53030;">
+        <div>
+            <div class="account-card-icon">&#9881;</div>
+            <div class="account-card-title" style="color: #c53030;">Admin Control Panel</div>
+            <div class="account-card-desc">Add and update products, manage categories, and oversee store orders.</div>
+        </div>
+        <a href="{{ url_for('admin_dashboard') }}" class="account-card-btn" style="background-color: #c53030; color: #fff;">Open Admin Panel &rarr;</a>
+    </div>
+    {% endif %}
+
+    <!-- 7. Sign Out -->
+    <div class="account-card">
+        <div>
+            <div class="account-card-icon">&#128682;</div>
+            <div class="account-card-title" style="color: #c53030;">Sign Out</div>
+            <div class="account-card-desc">Safely end your current session and sign out of your account.</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="account-card-btn danger">Sign Out</a>
+    </div>
+</div>
+{% endblock %}

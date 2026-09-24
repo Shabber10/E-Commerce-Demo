@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Sign-Up (OTP Verification) - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card" style="border-top: 4px solid #c53030; max-width: 480px;">
+        <div class="auth-header">
+            <h1 class="auth-title" style="color: #c53030;">&#9881; Admin Registration</h1>
+            <p class="auth-subtitle">Create a new store administrator account with Email OTP verification</p>
+        </div>
+
+        <div style="background-color: #fff8e1; border: 1px solid #ffe082; padding: 10px 14px; border-radius: 4px; font-size: 13px; color: #795548; margin-bottom: 18px;">
+            &#9432; <b>Security Notice:</b> A 6-digit one-time password (OTP) will be sent to your registered email to verify this administrator setup.
+        </div>
+
+        <form action="{{ url_for('admin_register') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input 
+                    type="text" 
+                    name="full_name" 
+                    value="{{ full_name or '' }}" 
+                    placeholder="e.g. John Admin" 
+                    required 
+                    autocomplete="name"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Email Address</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    value="{{ email or '' }}" 
+                    placeholder="admin@example.com" 
+                    required 
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input 
+                    type="text" 
+                    name="phone" 
+                    value="{{ phone or '' }}" 
+                    placeholder="10-digit mobile number" 
+                    required 
+                    autocomplete="tel"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Password (Min. 6 characters)</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    placeholder="Create secure admin password" 
+                    required 
+                    minlength="6"
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input 
+                    type="password" 
+                    name="confirm_password" 
+                    placeholder="Re-type password" 
+                    required 
+                    minlength="6"
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <div style="margin-top: 22px;">
+                <button type="submit" class="btn-full" style="background-color: #c53030; border-color: #c53030;">
+                    Send Email OTP &rarr;
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p style="margin-bottom: 8px;">
+                Already have an Admin account? 
+                <a href="{{ url_for('admin_login') }}" style="color: #c53030; font-weight: bold;">
+                    Admin Sign In &rarr;
+                </a>
+            </p>
+            <p style="margin: 0;">
+                <a href="{{ url_for('index') }}">&larr; Return to Store</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

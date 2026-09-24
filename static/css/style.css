@@ -1,0 +1,751 @@
+/* ========================================================
+   E-COMMERCE STORE STYLESHEET
+   Written by: Student Project
+   CSS Level: Basic to Intermediate (Clean, Proper & Responsive)
+   ======================================================== */
+
+/* 1. Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 2. Body and General Layout */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f7f9fa;
+    color: #333333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+main {
+    min-height: 70vh;
+}
+
+/* 3. Headings & Divider */
+h1, h2, h3, h4, h5, h6 {
+    color: #1a2332;
+    margin-bottom: 12px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #dcdcdc;
+    margin: 15px 0 20px 0;
+}
+
+/* 4. Links */
+a {
+    color: #1a56a0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #0c2340;
+    text-decoration: underline;
+}
+
+/* 5. Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a2332;
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.navbar-brand {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.navbar-brand:hover {
+    color: #e2e8f0;
+    text-decoration: none;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.navbar-nav li {
+    display: inline-block;
+}
+
+.navbar-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 7px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar-nav a:hover {
+    background-color: #2d3748;
+    text-decoration: none;
+}
+
+.navbar-user {
+    color: #cbd5e0;
+    font-size: 13px;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.cart-badge {
+    background-color: #e53e3e;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+.admin-link {
+    background-color: #c53030 !important;
+    color: #ffffff !important;
+}
+
+.admin-link:hover {
+    background-color: #9b2c2c !important;
+}
+
+/* Pure CSS Dropdown for Navigation Bar */
+.navbar-nav .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    min-width: 210px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 6px 0;
+    margin-top: 4px;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 10px 16px;
+    background-color: #f7f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 13px;
+    color: #333333;
+}
+
+.dropdown-menu a {
+    display: block;
+    color: #333333 !important;
+    padding: 9px 16px;
+    font-size: 13px;
+    text-decoration: none !important;
+    border-radius: 0;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f5f9 !important;
+    color: #0c2340 !important;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 4px 0;
+}
+
+/* 6. Buttons & Inputs */
+button,
+input[type="submit"],
+input[type="button"] {
+    background-color: #1a2332;
+    color: #ffffff;
+    border: 1px solid #1a2332;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: #2b394f;
+    border-color: #2b394f;
+}
+
+button:disabled {
+    background-color: #e0e0e0 !important;
+    color: #888888 !important;
+    border-color: #cccccc !important;
+    cursor: not-allowed;
+}
+
+/* Text Inputs, Select and Textarea */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #1a56a0;
+    outline: none;
+    box-shadow: 0 0 4px rgba(26, 86, 160, 0.3);
+}
+
+/* 7. Tables (Cart, Orders, Admin Panels) & Responsive Wrapper */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    margin: 15px 0 20px 0;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+table th {
+    background-color: #edf2f7;
+    color: #2d3748;
+    padding: 11px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #dddddd;
+    text-align: left;
+}
+
+table td {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+table tr:nth-child(even) td {
+    background-color: #fbfbfb;
+}
+
+table tr:hover td {
+    background-color: #f4f7fa;
+}
+
+/* 8. Container Boxes & Cards (Login, Register, Checkout, Details) */
+.card-box,
+div[style*="max-width: 450px"],
+div[style*="max-width: 480px"],
+div[style*="max-width: 500px"],
+div[style*="max-width: 550px"],
+div[style*="max-width: 600px"] {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* 9. Product Grid & Cards (Responsive) */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.product-card,
+div[style*="border: 1px solid #ccc"] {
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover,
+div[style*="border: 1px solid #ccc"]:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Top Horizontal Filter Bar */
+.top-filter-bar {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding: 10px 16px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    border-radius: 4px;
+}
+
+/* 10. Single Product Details Layout (Responsive) */
+.product-detail-layout {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.product-detail-image-col {
+    flex: 1 1 320px;
+    text-align: center;
+}
+
+.product-detail-info-col {
+    flex: 1 1 360px;
+}
+
+/* 11. Checkout Layout (Responsive) */
+.checkout-layout {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.checkout-address-col {
+    flex: 1 1 450px;
+    border-right: 1px solid #ddd;
+    padding-right: 25px;
+}
+
+.checkout-summary-col {
+    flex: 1 1 320px;
+}
+
+/* 12. Flash Messages / Alerts */
+#flash-messages {
+    margin-bottom: 20px;
+}
+
+#flash-messages div {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+}
+
+/* 13. Account Navigation Grid & Cards */
+.account-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 18px 24px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.account-user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.account-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+.account-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.account-card:hover {
+    border-color: #1a56a0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.account-card-icon {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.account-card-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a2332;
+    margin-bottom: 6px;
+}
+
+.account-card-desc {
+    font-size: 13px;
+    color: #666666;
+    margin-bottom: 14px;
+    flex-grow: 1;
+    line-height: 1.4;
+}
+
+.account-card-btn {
+    display: inline-block;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #f1f5f9;
+    color: #1a2332;
+    border: 1px solid #cbd5e1;
+    text-decoration: none !important;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.account-card-btn:hover {
+    background-color: #1a2332;
+    color: #ffffff;
+}
+
+.account-card-btn.danger {
+    background-color: #fff5f5;
+    color: #c53030;
+    border-color: #feb2b2;
+}
+
+.account-card-btn.danger:hover {
+    background-color: #c53030;
+    color: #ffffff;
+}
+
+/* Account Navigation Bar / Breadcrumbs */
+.account-nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.account-nav-bar span.label {
+    font-weight: bold;
+    color: #1a2332;
+    margin-right: 5px;
+}
+
+.account-nav-bar a {
+    color: #1a56a0;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.account-nav-bar a:hover {
+    text-decoration: underline;
+}
+
+.account-nav-bar a.active,
+.account-nav-bar span.active {
+    font-weight: bold;
+    color: #0c2340;
+}
+
+/* 14. Auth Pages (Update Password, Reset Password, OTP) */
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.auth-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1a2332;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    font-size: 13px;
+    color: #666666;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #333333;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 14px;
+    color: #888888;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    padding-left: 34px !important;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 6px;
+    background: none !important;
+    border: none !important;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px !important;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #666666;
+    border-top: 1px solid #eee;
+    padding-top: 14px;
+}
+
+/* 15. Footer */
+footer {
+    margin-top: 35px;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 13px;
+    color: #666666;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* ========================================================
+   16. RESPONSIVE MEDIA QUERIES (Beginner CSS Course Pattern)
+   ======================================================== */
+
+/* Tablets and Small Laptops (max-width: 900px) */
+@media (max-width: 900px) {
+    .checkout-address-col {
+        border-right: none;
+        padding-right: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+    }
+}
+
+/* Mobile Screens and Tablets (max-width: 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .navbar-brand {
+        text-align: center;
+    }
+
+    .navbar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .navbar-nav li {
+        margin: 2px 0;
+    }
+
+    .navbar-nav a {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: 1px solid #ddd;
+        margin-top: 6px;
+    }
+
+    /* Top Search & Filter Bar */
+    .top-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .top-filter-bar form {
+        width: 100%;
+        display: flex;
+    }
+
+    .top-filter-bar form input[type="text"] {
+        flex: 1;
+        width: auto !important;
+    }
+
+    /* Product Grid */
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    /* Single Product Details */
+    .product-detail-layout {
+        flex-direction: column;
+    }
+
+    /* Checkout Page */
+    .checkout-layout {
+        flex-direction: column;
+    }
+
+    /* Account Dashboard */
+    .account-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px;
+    }
+
+    .account-nav-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-nav-bar {
+        font-size: 12px;
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    /* Tables */
+    .table-responsive table {
+        min-width: 520px;
+    }
+}
+
+/* Small Smart Phones (max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-card {
+        padding: 16px;
+        border-radius: 4px;
+    }
+
+    div[style*="max-width: 450px"],
+    div[style*="max-width: 480px"],
+    div[style*="max-width: 500px"],
+    div[style*="max-width: 600px"] {
+        padding: 15px !important;
+        margin: 10px auto !important;
+        width: 100% !important;
+    }
+}

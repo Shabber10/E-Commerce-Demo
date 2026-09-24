@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div style="max-width: 480px; margin: 30px auto; padding: 20px; border: 1px solid #ccc; background-color: #fff;">
+    <h2 align="center">Create New Account</h2>
+    <hr>
+    <br>
+
+    <form action="{{ url_for('register') }}" method="POST">
+        <table width="100%" cellpadding="8">
+            <tr>
+                <td><b>Full Name:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="text" 
+                        name="full_name" 
+                        value="{{ full_name or '' }}" 
+                        placeholder="Enter full name" 
+                        required 
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td><b>Email Address:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value="{{ email or '' }}" 
+                        placeholder="Enter email address" 
+                        required 
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td><b>Phone Number:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="text" 
+                        name="phone" 
+                        placeholder="10-digit mobile number" 
+                        required 
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td><b>Password (Min. 6 chars):</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Enter password" 
+                        required 
+                        minlength="6"
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td><b>Confirm Password:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="password" 
+                        name="confirm_password" 
+                        placeholder="Confirm password" 
+                        required 
+                        minlength="6"
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button type="submit" style="width: 100%; padding: 10px; font-weight: bold; cursor: pointer;">
+                        Register / Sign Up
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <br>
+    <div align="center">
+        <p>Already have an account? <a href="{{ url_for('login') }}"><b>Sign In here</b></a></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Manage Categories{% endblock %}
+
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to Admin Panel</a></p>
+
+<h2>Category Management</h2>
+<hr>
+
+<table width="100%" cellpadding="15">
+    <tr>
+        <td width="55%" valign="top">
+            <h3>Existing Categories</h3>
+            {% if categories %}
+                <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse;">
+                    <thead>
+                        <tr bgcolor="#f0f0f0">
+                            <th width="50">ID</th>
+                            <th>Category Name</th>
+                            <th width="80">Products</th>
+                            <th width="90">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                            <tr>
+                                <td align="center">{{ cat.category_id }}</td>
+                                <td><b>{{ cat.category_name }}</b></td>
+                                <td align="center">{{ cat.product_count or 0 }}</td>
+                                <td align="center">
+                                    <form action="{{ url_for('admin_category_delete', category_id=cat.category_id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this category?');">
+                                        <button type="submit" style="color: red; border: none; background: none; text-decoration: underline; cursor: pointer;">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No categories found.</p>
+            {% endif %}
+        </td>
+
+        <td width="45%" valign="top">
+            <div style="border: 1px solid #ccc; padding: 15px; background-color: #fff;">
+                <h3>Add New Category</h3>
+                <form action="{{ url_for('admin_categories') }}" method="POST">
+                    <p><b>Category Name:</b></p>
+                    <input 
+                        type="text" 
+                        name="category_name" 
+                        placeholder="e.g. Sports & Fitness" 
+                        required 
+                        style="width: 100%; padding: 7px; box-sizing: border-box;"
+                    >
+                    <br><br>
+                    <button type="submit" style="padding: 8px 18px; font-weight: bold; cursor: pointer;">
+                        Add Category
+                    </button>
+                </form>
+            </div>
+        </td>
+    </tr>
+</table>
+{% endblock %}

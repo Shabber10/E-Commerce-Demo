@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP - NovaStore{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Verify OTP</h1>
+            <p class="auth-subtitle">Enter the 6-digit code sent to {{ masked_email }}</p>
+        </div>
+
+        <form action="{{ url_for('verify_otp') }}" method="POST">
+            <!-- OTP Field -->
+            <div class="form-group">
+                <label for="otp" class="form-label">6-Digit Code</label>
+                <div class="input-wrapper">
+                    <span class="input-icon" aria-hidden="true">🔢</span>
+                    <input 
+                        type="text" 
+                        id="otp" 
+                        name="otp" 
+                        class="form-control" 
+                        placeholder="123456" 
+                        maxlength="6" 
+                        pattern="[0-9]{6}" 
+                        required 
+                        autocomplete="one-time-code"
+                    >
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-full">
+                Verify Code &rarr;
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Didn't receive code? 
+            <a href="{{ url_for('resend_otp') }}">Resend OTP</a> | 
+            <a href="{{ url_for('forgot_password') }}">Change Email</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

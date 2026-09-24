@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 30px auto; padding: 20px; border: 1px solid #ccc; background-color: #fff;">
+    <h2 align="center">Sign In to Your Account</h2>
+    <hr>
+    <br>
+
+    <form action="{{ url_for('login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}" method="POST">
+        <table width="100%" cellpadding="8">
+            <tr>
+                <td><b>Email Address:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value="{{ email or request.args.get('email', '') }}" 
+                        placeholder="Enter email" 
+                        required 
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td><b>Password:</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Enter password" 
+                        required 
+                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button type="submit" style="width: 100%; padding: 10px; font-weight: bold; cursor: pointer;">
+                        Sign In
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <br>
+    <div align="center">
+        <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
+        <p>Don't have an account? <a href="{{ url_for('register') }}"><b>Create an Account (Sign Up)</b></a></p>
+    </div>
+</div>
+{% endblock %}

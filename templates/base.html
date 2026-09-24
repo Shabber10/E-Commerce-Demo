@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce Store{% endblock %}</title>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Proper Navigation Bar -->
+    <header>
+        <nav class="navbar">
+            <a href="{{ url_for('index') }}" class="navbar-brand">
+                &#128722; E-Commerce Store
+            </a>
+
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li>
+                    <a href="{{ url_for('cart_view') }}">
+                        Cart <span class="cart-badge" id="cart-count">{{ cart_count }}</span>
+                    </a>
+                </li>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                        <li><a href="{{ url_for('admin_dashboard') }}" class="admin-link">Admin Panel</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('customer_orders') }}">My Orders</a></li>
+
+                    <!-- Account Navigation Dropdown -->
+                    <li class="dropdown">
+                        <a href="{{ url_for('dashboard') }}" class="dropdown-toggle">
+                            {% if current_user.profile_image %}
+                                <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ffffff;">
+                            {% else %}
+                                <span>&#128100;</span>
+                            {% endif %}
+                            <span><b>{{ current_user.name }}</b></span>
+                            <span style="font-size: 10px; margin-left: 2px;">&#9660;</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-header">
+                                <b>{{ current_user.name }}</b>
+                                <div style="font-size: 11px; color: #666;">{{ current_user.email }}</div>
+                            </div>
+                            <a href="{{ url_for('dashboard') }}">&#128202; Dashboard</a>
+                            <a href="{{ url_for('profile') }}">&#128100; My Profile</a>
+                            <a href="{{ url_for('customer_orders') }}">&#128230; My Orders</a>
+                            <a href="{{ url_for('cart_view') }}">&#128722; Shopping Cart</a>
+                            <a href="{{ url_for('updatepassword') }}">&#128273; Change Password</a>
+                            {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('admin_dashboard') }}" style="color: #c53030 !important; font-weight: bold;">&#9881; Admin Control Panel</a>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            <a href="{{ url_for('logout') }}" style="color: #e53e3e !important;">&#128682; Sign Out</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Sign In</a></li>
+                    <li><a href="{{ url_for('register') }}" style="background-color: #2b6cb0;">Create Account</a></li>
+                    <li><a href="{{ url_for('admin_login') }}" style="background-color: #4a5568; font-size: 12px;">Admin Portal</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-messages">
+                {% for category, message in messages %}
+                    <div style="padding: 10px 15px; margin-bottom: 15px; border: 1px solid #ccc; background-color: {% if category == 'success' %}#e8f5e9{% elif category == 'danger' %}#ffebee{% elif category == 'warning' %}#fff8e1{% else %}#e3f2fd{% endif %};">
+                        <b>[{{ category|upper }}]:</b> {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Page Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <br><hr>
+    <footer align="center">
+        <p>&copy; 2026 E-Commerce Store Project</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

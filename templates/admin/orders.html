@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Customer Orders{% endblock %}
+
+{% block content %}
+<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to Admin Panel</a></p>
+
+<h2>Customer Orders</h2>
+<hr>
+
+{% if orders %}
+    <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse;">
+        <thead>
+            <tr bgcolor="#f0f0f0">
+                <th width="120">Order #</th>
+                <th>Customer</th>
+                <th width="110">Date</th>
+                <th width="90">Total (₹)</th>
+                <th width="100">Payment</th>
+                <th width="140">Order Status</th>
+                <th width="80">Invoice</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ord in orders %}
+                <tr>
+                    <td align="center"><b>{{ ord.order_number }}</b></td>
+                    <td>
+                        {{ ord.first_name }} {{ ord.last_name }}<br>
+                        <small style="color: #666;">{{ ord.e_mail }} | Ph: {{ ord.phone_number }}</small>
+                    </td>
+                    <td align="center"><small>{{ ord.order_date.strftime('%Y-%m-%d %H:%M') if ord.order_date else '' }}</small></td>
+                    <td align="center"><b>₹{{ "%.2f"|format(ord.total_amount) }}</b></td>
+                    <td align="center">
+                        {% if ord.payment_status == 'completed' %}
+                            <span style="color: green; font-weight: bold;">Paid</span><br>
+                            <small>{{ ord.payment_method or 'Razorpay' }}</small>
+                        {% else %}
+                            <span style="color: orange;">{{ ord.payment_status or 'Pending' }}</span>
+                        {% endif %}
+                    </td>
+                    <td align="center">
+                        <form action="{{ url_for('admin_order_status', order_id=ord.order_id) }}" method="POST">
+                            <select name="status" onchange="this.form.submit()" style="padding: 4px;">
+                                <option value="pending" {% if ord.order_status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="processing" {% if ord.order_status == 'processing' %}selected{% endif %}>Processing</option>
+                                <option value="shipped" {% if ord.order_status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="delivered" {% if ord.order_status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="cancelled" {% if ord.order_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td align="center">
+                        <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No customer orders placed yet.</p>
+{% endif %}
+{% endblock %}

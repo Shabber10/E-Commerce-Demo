@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - E-Commerce Store{% endblock %}
+
+{% block content %}
+<table width="100%" cellpadding="5">
+    <tr>
+        <td>
+            <h2>Admin Control Panel</h2>
+            <p>Administrator Account: <b>{{ current_user.name }}</b> ({{ current_user.email }})</p>
+        </td>
+        <td align="right">
+            <a href="{{ url_for('index') }}"><button type="button" style="padding: 6px 14px; cursor: pointer;">&larr; View Live Store</button></a>
+        </td>
+    </tr>
+</table>
+<hr>
+
+<!-- Navigation Menu Table -->
+<h3>Admin Navigation Menu</h3>
+<div class="table-responsive">
+    <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse; background-color: #f9f9f9; text-align: center;">
+        <tr>
+            <th width="20%">
+                <a href="{{ url_for('admin_products') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
+                    &#128230; <b>Manage Products</b>
+                </a>
+            </th>
+            <th width="20%">
+                <a href="{{ url_for('admin_product_add') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
+                    &#10010; <b>Add Product</b>
+                </a>
+            </th>
+            <th width="20%">
+                <a href="{{ url_for('admin_categories') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
+                    &#128194; <b>Categories</b>
+                </a>
+            </th>
+            <th width="20%">
+                <a href="{{ url_for('admin_orders') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
+                    &#128221; <b>Customer Orders</b>
+                </a>
+            </th>
+            <th width="20%">
+                <a href="{{ url_for('admin_profile') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
+                    &#128100; <b>Admin Profile</b>
+                </a>
+            </th>
+        </tr>
+    </table>
+</div>
+
+<br>
+
+<!-- Store Statistics Table -->
+<h3>Store Overview &amp; Key Metrics</h3>
+<div class="table-responsive">
+    <table width="100%" border="1" cellpadding="14" style="border-collapse: collapse; text-align: center;">
+        <thead>
+            <tr bgcolor="#f0f0f0">
+                <th width="25%">Total Active Products</th>
+                <th width="25%">Total Categories</th>
+                <th width="25%">Total Orders Placed</th>
+                <th width="25%">Registered Customers</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <h1 style="margin: 5px 0;">{{ total_products }}</h1>
+                    <small><a href="{{ url_for('admin_products') }}">View all products &rarr;</a></small>
+                </td>
+                <td>
+                    <h1 style="margin: 5px 0;">{{ total_categories }}</h1>
+                    <small><a href="{{ url_for('admin_categories') }}">View all categories &rarr;</a></small>
+                </td>
+                <td>
+                    <h1 style="margin: 5px 0;">{{ total_orders }}</h1>
+                    <small><a href="{{ url_for('admin_orders') }}">View all orders &rarr;</a></small>
+                </td>
+                <td>
+                    <h1 style="margin: 5px 0;">{{ total_users }}</h1>
+                    <small>Active user accounts</small>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<br>
+
+<!-- Quick Action Operations Table -->
+<h3>Admin Quick Action Directory</h3>
+<div class="table-responsive">
+    <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse;">
+        <thead>
+            <tr bgcolor="#f0f0f0">
+                <th width="50" align="center">#</th>
+                <th width="220">Operation Name</th>
+                <th>Description</th>
+                <th width="150" align="center">Action Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td align="center">1</td>
+                <td><b>Upload New Product</b></td>
+                <td>Add a new catalog product with name, price, stock, and upload product photo.</td>
+                <td align="center"><a href="{{ url_for('admin_product_add') }}"><button style="padding: 5px 12px; cursor: pointer;">Upload Product</button></a></td>
+            </tr>
+            <tr>
+                <td align="center">2</td>
+                <td><b>Product Catalog List</b></td>
+                <td>View all products in tabular format, update inventory, edit info, or delete items.</td>
+                <td align="center"><a href="{{ url_for('admin_products') }}"><button style="padding: 5px 12px; cursor: pointer;">Product Table</button></a></td>
+            </tr>
+            <tr>
+                <td align="center">3</td>
+                <td><b>Category Management</b></td>
+                <td>Create new product classifications and view items per category.</td>
+                <td align="center"><a href="{{ url_for('admin_categories') }}"><button style="padding: 5px 12px; cursor: pointer;">Categories Table</button></a></td>
+            </tr>
+            <tr>
+                <td align="center">4</td>
+                <td><b>Order Processing</b></td>
+                <td>Track customer orders, check Razorpay payment IDs, and update order dispatch status.</td>
+                <td align="center"><a href="{{ url_for('admin_orders') }}"><button style="padding: 5px 12px; cursor: pointer;">Orders Table</button></a></td>
+            </tr>
+            <tr>
+                <td align="center">5</td>
+                <td><b>Admin Profile &amp; Settings</b></td>
+                <td>Manage administrator account name, email, credentials, and profile image upload.</td>
+                <td align="center"><a href="{{ url_for('admin_profile') }}"><button style="padding: 5px 12px; cursor: pointer;">Admin Profile</button></a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Admin OTP - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card" style="border-top: 4px solid #c53030; max-width: 440px;">
+        <div class="auth-header">
+            <h1 class="auth-title" style="color: #c53030;">&#128272; Verify Admin OTP</h1>
+            <p class="auth-subtitle">
+                Enter the 6-digit verification code sent to <b>{{ masked_email }}</b>
+            </p>
+        </div>
+
+        <form action="{{ url_for('admin_verify_otp') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">6-Digit Code</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">&#128290;</span>
+                    <input 
+                        type="text" 
+                        name="otp" 
+                        placeholder="123456" 
+                        maxlength="6" 
+                        pattern="[0-9]{6}" 
+                        required 
+                        style="text-align: center; font-size: 20px; letter-spacing: 4px; font-weight: bold;"
+                    >
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn-full" style="background-color: #c53030; border-color: #c53030;">
+                    Complete Admin Registration &rarr;
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p style="margin-bottom: 8px;">
+                Didn't receive code? 
+                <a href="{{ url_for('admin_register') }}" style="color: #c53030;">Start Over / Resend</a>
+            </p>
+            <p style="margin: 0;">
+                <a href="{{ url_for('admin_login') }}">&larr; Back to Admin Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
