@@ -1,63 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Customer Orders{% endblock %}
+{% block title %}Manage Customer Orders - E-Commerce Demo Admin{% endblock %}
 
 {% block content %}
-<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to Admin Panel</a></p>
+<!-- Admin Navigation Toolbar -->
+<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
+    <a href="{{ url_for('admin_dashboard') }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Admin Dashboard
+    </a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_products') }}">Manage Products</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_categories') }}">Categories</a>
+    <span style="color: #cbd5e1;">/</span>
+    <span class="active">Customer Orders</span>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_profile') }}">Admin Profile</a>
+</div>
 
-<h2>Customer Orders</h2>
-<hr>
+<div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Incoming Customer Orders</h1>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Track customer purchases, audit payment transaction IDs, and update dispatch status</p>
+    </div>
+</div>
 
 {% if orders %}
-    <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse;">
-        <thead>
-            <tr bgcolor="#f0f0f0">
-                <th width="120">Order #</th>
-                <th>Customer</th>
-                <th width="110">Date</th>
-                <th width="90">Total (₹)</th>
-                <th width="100">Payment</th>
-                <th width="140">Order Status</th>
-                <th width="80">Invoice</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ord in orders %}
+    <div class="table-responsive" style="margin-top: 0;">
+        <table>
+            <thead>
                 <tr>
-                    <td align="center"><b>{{ ord.order_number }}</b></td>
-                    <td>
-                        {{ ord.first_name }} {{ ord.last_name }}<br>
-                        <small style="color: #666;">{{ ord.e_mail }} | Ph: {{ ord.phone_number }}</small>
-                    </td>
-                    <td align="center"><small>{{ ord.order_date.strftime('%Y-%m-%d %H:%M') if ord.order_date else '' }}</small></td>
-                    <td align="center"><b>₹{{ "%.2f"|format(ord.total_amount) }}</b></td>
-                    <td align="center">
-                        {% if ord.payment_status == 'completed' %}
-                            <span style="color: green; font-weight: bold;">Paid</span><br>
-                            <small>{{ ord.payment_method or 'Razorpay' }}</small>
-                        {% else %}
-                            <span style="color: orange;">{{ ord.payment_status or 'Pending' }}</span>
-                        {% endif %}
-                    </td>
-                    <td align="center">
-                        <form action="{{ url_for('admin_order_status', order_id=ord.order_id) }}" method="POST">
-                            <select name="status" onchange="this.form.submit()" style="padding: 4px;">
-                                <option value="pending" {% if ord.order_status == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="processing" {% if ord.order_status == 'processing' %}selected{% endif %}>Processing</option>
-                                <option value="shipped" {% if ord.order_status == 'shipped' %}selected{% endif %}>Shipped</option>
-                                <option value="delivered" {% if ord.order_status == 'delivered' %}selected{% endif %}>Delivered</option>
-                                <option value="cancelled" {% if ord.order_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                            </select>
-                        </form>
-                    </td>
-                    <td align="center">
-                        <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank">View</a>
-                    </td>
+                    <th width="150">Order #</th>
+                    <th>Customer Information</th>
+                    <th width="150">Date</th>
+                    <th width="120">Total Paid</th>
+                    <th width="130">Payment</th>
+                    <th width="160">Update Status</th>
+                    <th width="100" style="text-align: right;">Invoice</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for ord in orders %}
+                    <tr>
+                        <td>
+                            <span style="font-family: monospace; font-size: 13.5px; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                #{{ ord.order_number }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-weight: 700; color: #0f172a; font-size: 14px;">
+                                {{ ord.first_name }} {{ ord.last_name }}
+                            </div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                {{ ord.e_mail }} &bull; Ph: {{ ord.phone_number }}
+                            </div>
+                        </td>
+                        <td style="color: #64748b; font-size: 13px;">
+                            {{ ord.order_date.strftime('%d %b %Y, %I:%M %p') if ord.order_date else '' }}
+                        </td>
+                        <td style="font-weight: 800; color: #0f172a; font-size: 14.5px;">
+                            ₹{{ "%.2f"|format(ord.total_amount) }}
+                        </td>
+                        <td>
+                            {% if ord.payment_status == 'completed' %}
+                                <span class="badge badge-success">Paid</span>
+                                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">{{ ord.payment_method or 'Online' }}</div>
+                            {% else %}
+                                <span class="badge badge-warning">{{ ord.payment_status|capitalize or 'Pending' }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('admin_order_status', order_id=ord.order_id) }}" method="POST" style="margin: 0;">
+                                <select name="status" onchange="this.form.submit()" style="height: 36px; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 8px;">
+                                    <option value="pending" {% if ord.order_status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="processing" {% if ord.order_status == 'processing' %}selected{% endif %}>Processing</option>
+                                    <option value="shipped" {% if ord.order_status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="delivered" {% if ord.order_status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="cancelled" {% if ord.order_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                <span>View</span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
-    <p>No customer orders placed yet.</p>
+    <div style="border: 1px solid var(--slate-200); padding: 56px 24px; background-color: #ffffff; text-align: center; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); max-width: 520px; margin: 30px auto;">
+        <h3 style="font-size: 18px; margin-bottom: 6px;">No Customer Orders Placed Yet</h3>
+        <p style="color: #64748b; font-size: 13.5px;">
+            Incoming customer transactions and checkout orders will appear here for processing and fulfillment.
+        </p>
+    </div>
 {% endif %}
 {% endblock %}

@@ -1,52 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Manage Products{% endblock %}
+{% block title %}Manage Products - E-Commerce Demo Admin{% endblock %}
 
 {% block content %}
-<!-- Admin Breadcrumbs -->
-<div class="account-nav-bar">
-    <a href="{{ url_for('admin_dashboard') }}">&larr; Admin Dashboard</a>
-    <span>|</span>
+<!-- Admin Navigation Toolbar -->
+<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
+    <a href="{{ url_for('admin_dashboard') }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Admin Dashboard
+    </a>
+    <span style="color: #cbd5e1;">/</span>
     <span class="active">Manage Products</span>
-    <span>|</span>
-    <a href="{{ url_for('admin_product_add') }}">+ Add New Product</a>
-    <span>|</span>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_product_add') }}">+ Add Product</a>
+    <span style="color: #cbd5e1;">/</span>
     <a href="{{ url_for('admin_categories') }}">Categories</a>
-    <span>|</span>
+    <span style="color: #cbd5e1;">/</span>
     <a href="{{ url_for('admin_orders') }}">Orders</a>
 </div>
 
-<table width="100%">
-    <tr>
-        <td><h2>Product Management</h2></td>
-        <td align="right">
-            <a href="{{ url_for('admin_product_add') }}">
-                <button style="padding: 8px 15px; font-weight: bold; cursor: pointer; background-color: #c53030; border-color: #c53030;">
-                    + Add New Product
-                </button>
-            </a>
-        </td>
-    </tr>
-</table>
-<hr>
+<div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Product Inventory Catalog</h1>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Perform full CRUD operations, inventory adjustments, and status management</p>
+    </div>
+    <a href="{{ url_for('admin_product_add') }}" class="btn btn-admin">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>+ Add New Product</span>
+    </a>
+</div>
 
-<!-- Search and Filter Form (FLASK 31) -->
-<div style="background-color: #ffffff; border: 1px solid #ddd; border-radius: 4px; padding: 14px; margin-bottom: 20px;">
-    <form action="{{ url_for('admin_products') }}" method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 0;">
-        <div style="flex: 1; min-width: 180px;">
-            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Search Keyword:</label>
+<!-- Modern Filter and Search Box -->
+<div class="card-box" style="padding: 18px 20px; margin-bottom: 24px;">
+    <form action="{{ url_for('admin_products') }}" method="GET" style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin: 0;">
+        <div style="flex: 1; min-width: 200px;">
+            <label class="form-label" style="font-size: 12.5px;">Search Keywords</label>
             <input 
                 type="text" 
                 name="search" 
                 value="{{ search_query or '' }}" 
-                placeholder="Product name or description..." 
-                style="padding: 6px 10px; font-size: 13px;"
+                placeholder="Search by title, description..." 
+                style="height: 42px;"
             >
         </div>
 
-        <div style="width: 180px;">
-            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Category:</label>
-            <select name="category" style="padding: 6px 10px; font-size: 13px;">
+        <div style="width: 200px;">
+            <label class="form-label" style="font-size: 12.5px;">Category Filter</label>
+            <select name="category" style="height: 42px;">
                 <option value="">-- All Categories --</option>
                 {% for cat in categories %}
                     <option value="{{ cat.category_id }}" {% if selected_category == cat.category_id %}selected{% endif %}>
@@ -56,27 +56,25 @@
             </select>
         </div>
 
-        <div style="width: 130px;">
-            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Max Price (₹):</label>
+        <div style="width: 140px;">
+            <label class="form-label" style="font-size: 12.5px;">Max Price (₹)</label>
             <input 
                 type="number" 
                 step="0.01" 
                 name="max_price" 
                 value="{{ max_price or '' }}" 
                 placeholder="e.g. 5000" 
-                style="padding: 6px 10px; font-size: 13px;"
+                style="height: 42px;"
             >
         </div>
 
-        <div style="margin-top: 18px; display: flex; gap: 6px;">
-            <button type="submit" style="padding: 7px 16px; font-size: 13px;">
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-primary" style="height: 42px; padding: 0 18px;">
                 Filter
             </button>
             {% if search_query or selected_category or max_price %}
-                <a href="{{ url_for('admin_products') }}">
-                    <button type="button" style="padding: 7px 12px; font-size: 13px; background-color: #eee; color: #333; border-color: #ccc;">
-                        Reset
-                    </button>
+                <a href="{{ url_for('admin_products') }}" class="btn btn-secondary" style="height: 42px;">
+                    Reset
                 </a>
             {% endif %}
         </div>
@@ -84,66 +82,83 @@
 </div>
 
 {% if products %}
-    <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Found <b>{{ products|length }}</b> product(s):</p>
-    <div class="table-responsive">
-        <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13.5px; color: #64748b;">
+        <span>Showing <b>{{ products|length }}</b> catalog items:</span>
+    </div>
+
+    <div class="table-responsive" style="margin-top: 0;">
+        <table>
             <thead>
-                <tr bgcolor="#f0f0f0">
-                    <th width="40">ID</th>
-                    <th width="80">Photo</th>
-                    <th>Product Name</th>
+                <tr>
+                    <th width="50">ID</th>
+                    <th width="75">Photo</th>
+                    <th>Product Title &amp; Overview</th>
                     <th width="140">Category</th>
-                    <th width="90">Price (₹)</th>
-                    <th width="70">Stock</th>
-                    <th width="70">Status</th>
-                    <th width="180">Actions</th>
+                    <th width="110">Price</th>
+                    <th width="90">Stock</th>
+                    <th width="90">Status</th>
+                    <th width="160" style="text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for prod in products %}
                     <tr>
-                        <td align="center">{{ prod.product_id }}</td>
-                        <td align="center">
-                            <a href="{{ url_for('product_detail', product_id=prod.product_id) }}">
-                                {% if prod.image_url %}
-                                    <img src="{{ url_for('uploaded_file', filename=prod.image_url) }}" alt="{{ prod.product_name }}" width="55" height="55" style="object-fit: cover; border: 1px solid #ccc;">
-                                {% else %}
-                                    <small>No photo</small>
-                                {% endif %}
-                            </a>
+                        <td style="font-family: monospace; font-size: 12px; color: #94a3b8;">
+                            #{{ prod.product_id }}
                         </td>
                         <td>
-                            <a href="{{ url_for('product_detail', product_id=prod.product_id) }}" style="font-weight: bold; font-size: 14px;" title="View single item details">
+                            <div style="width: 52px; height: 52px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                {% if prod.image_url %}
+                                    <img src="{{ url_for('uploaded_file', filename=prod.image_url) }}" alt="{{ prod.product_name }}" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                                {% else %}
+                                    <span style="font-size: 9px; color: #94a3b8;">No photo</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('product_detail', product_id=prod.product_id) }}" style="font-weight: 700; color: #0f172a; font-size: 14px; display: block; margin-bottom: 3px;">
                                 {{ prod.product_name }}
                             </a>
                             {% if prod.description %}
-                                <br><small style="color: #666;">{{ prod.description[:85] }}{% if prod.description|length > 85 %}...{% endif %}</small>
+                                <div style="font-size: 12px; color: #64748b; line-height: 1.4; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ prod.description }}
+                                </div>
                             {% endif %}
                         </td>
-                        <td align="center">{{ prod.category_name }}</td>
-                        <td align="center">₹{{ "%.2f"|format(prod.price) }}</td>
-                        <td align="center">
+                        <td>
+                            <span class="badge badge-neutral" style="font-size: 11px;">
+                                {{ prod.category_name }}
+                            </span>
+                        </td>
+                        <td style="font-weight: 800; color: #0f172a; font-size: 14.5px;">
+                            ₹{{ "%.2f"|format(prod.price) }}
+                        </td>
+                        <td>
                             {% if prod.stock_quantity > 0 %}
-                                <span style="color: green; font-weight: bold;">{{ prod.stock_quantity }}</span>
+                                <span class="badge badge-success">{{ prod.stock_quantity }} units</span>
                             {% else %}
-                                <span style="color: red; font-weight: bold;">0</span>
+                                <span class="badge badge-danger">0 Out</span>
                             {% endif %}
                         </td>
-                        <td align="center">
+                        <td>
                             {% if prod.is_active %}
-                                <span style="color: green; font-weight: bold;">Active</span>
+                                <span class="badge badge-success">Active</span>
                             {% else %}
-                                <span style="color: red;">Inactive</span>
+                                <span class="badge badge-danger">Inactive</span>
                             {% endif %}
                         </td>
-                        <td align="center">
-                            <a href="{{ url_for('admin_product_view', product_id=prod.product_id) }}" style="margin-right: 6px;">View</a> |
-                            <a href="{{ url_for('admin_product_edit', product_id=prod.product_id) }}" style="margin: 0 6px;">Edit</a> |
-                            <form action="{{ url_for('admin_product_delete', product_id=prod.product_id) }}" method="POST" style="display: inline; margin-left: 6px;" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                <button type="submit" style="color: red; background: none; border: none; text-decoration: underline; cursor: pointer; padding: 0; font-size: 13px;">
-                                    Delete
-                                </button>
-                            </form>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <div style="display: inline-flex; gap: 6px;">
+                                <a href="{{ url_for('admin_product_edit', product_id=prod.product_id) }}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" title="Edit Product">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    <span>Edit</span>
+                                </a>
+                                <form action="{{ url_for('admin_product_delete', product_id=prod.product_id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to permanently delete this product?');">
+                                    <button type="submit" class="btn btn-danger" style="padding: 5px 9px; font-size: 12px;" title="Delete Item">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
@@ -151,9 +166,14 @@
         </table>
     </div>
 {% else %}
-    <div style="background-color: #fff; border: 1px solid #ddd; padding: 25px; text-align: center;">
-        <p>No products found matching your search and filter criteria.</p>
-        <a href="{{ url_for('admin_products') }}"><button type="button">Reset Filters</button></a>
+    <div style="border: 1px solid var(--slate-200); padding: 56px 24px; background-color: #ffffff; text-align: center; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); max-width: 520px; margin: 30px auto;">
+        <h3 style="font-size: 18px; margin-bottom: 6px;">No Products Found</h3>
+        <p style="color: #64748b; font-size: 13.5px; margin-bottom: 18px;">
+            No items match your active filters. Try searching with different keywords.
+        </p>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">
+            Reset Filters
+        </a>
     </div>
 {% endif %}
 {% endblock %}

@@ -1,57 +1,98 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Portal Sign In - E-Commerce Store{% endblock %}
+{% block title %}Admin Sign In - E-Commerce Demo{% endblock %}
 
 {% block content %}
 <div class="auth-page">
-    <div class="auth-card" style="border-top: 4px solid #c53030;">
+    <div class="auth-card admin-card">
         <div class="auth-header">
-            <h1 class="auth-title" style="color: #c53030;">&#9881; Admin Portal Sign In</h1>
-            <p class="auth-subtitle">Restricted to store administrators and authorized managers</p>
+            <div class="auth-badge-wrapper">
+                <span class="auth-badge admin">
+                    <span class="badge-dot"></span> Administrator Portal
+                </span>
+            </div>
+
+            <div class="auth-icon-wrap admin">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </div>
+
+            <h1 class="auth-title">Admin Sign In</h1>
+            <p class="auth-subtitle">Restricted gateway for store management and authorized personnel</p>
         </div>
 
         <form action="{{ url_for('admin_login') }}" method="POST">
             <div class="form-group">
-                <label class="form-label">Admin Email Address</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    value="{{ email or '' }}" 
-                    placeholder="admin@example.com" 
-                    required 
-                    autocomplete="email"
-                >
+                <label class="form-label">Administrator Email</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value="{{ email or '' }}" 
+                        placeholder="admin@example.com" 
+                        required 
+                        autocomplete="email"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    placeholder="Enter admin password" 
-                    required 
-                    autocomplete="current-password"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Enter admin password" 
+                        required 
+                        autocomplete="current-password"
+                    >
+                </div>
             </div>
 
-            <div style="margin-top: 20px;">
-                <button type="submit" class="btn-full" style="background-color: #c53030; border-color: #c53030;">
-                    Sign In to Admin Dashboard &rarr;
+            <div style="margin-top: 24px;">
+                <button type="submit" class="btn-auth-primary admin-btn">
+                    <span>Access Admin Dashboard</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                 </button>
             </div>
         </form>
 
         <div class="auth-footer">
-            <p style="margin-bottom: 8px;">
-                Need to create an Admin account? 
-                <a href="{{ url_for('admin_register') }}" style="color: #c53030; font-weight: bold;">
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #64748b;">
+                Need to register an Admin account? 
+                <a href="{{ url_for('admin_register') }}" style="color: #e11d48; font-weight: 700; text-decoration: none;">
                     Admin Sign-Up with OTP &rarr;
                 </a>
             </p>
-            <p style="margin: 0;">
-                <a href="{{ url_for('login') }}">&larr; Customer Sign In</a> | 
-                <a href="{{ url_for('index') }}">Store Home</a>
-            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; font-size: 13px;">
+                <a href="{{ url_for('login') }}" class="auth-nav-link">&larr; Customer Sign In</a>
+                <span style="color: #cbd5e1;">&bull;</span>
+                <a href="{{ url_for('index') }}" class="auth-nav-link">Store Front</a>
+            </div>
+
+            <div class="auth-trust-footer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>Encrypted Store Administration</span>
+            </div>
         </div>
     </div>
 </div>

@@ -11,6 +11,19 @@ except ImportError:
     mysql = None
     MySQLError = Exception
 
+# Auto-load .env file if present in workspace root
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(_env_path):
+    try:
+        with open(_env_path, 'r', encoding='utf-8') as _env_f:
+            for _raw_line in _env_f:
+                _line = _raw_line.strip()
+                if _line and not _line.startswith('#') and '=' in _line:
+                    _k, _v = _line.split('=', 1)
+                    os.environ[_k.strip()] = _v.strip().strip("'\"")
+    except Exception as _env_err:
+        print(f"Notice: Could not load .env file: {_env_err}")
+
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'super-secret-key-change-in-production-ecommerce-2026')

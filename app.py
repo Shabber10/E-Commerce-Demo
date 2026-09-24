@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import random
+import time
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify, make_response
@@ -1852,24 +1853,17 @@ def payment_process():
     customer_id = session.get('user_id')
     cart_id = get_or_create_cart(customer_id)
 
-    phone_number = request.form.get('phone_number', '').strip()
-    address_line = request.form.get('address_line', '').strip()
-    city = request.form.get('city', '').strip()
-    state = request.form.get('state', '').strip()
-    pincode = request.form.get('pincode', '').strip()
-    payment_method = request.form.get('payment_method', 'Razorpay Gateway').strip()
-    
-    # Razorpay payload
+    phone_number = request.form.get('phone_number', '').strip() or '9876543210'
+    address_line = request.form.get('address_line', '').strip() or '123 Main Street, Sector 4'
+    city = request.form.get('city', '').strip() or 'New Delhi'
+    state = request.form.get('state', '').strip() or 'Delhi'
+    pincode = request.form.get('pincode', '').strip() or '110001'
+
+    payment_method = request.form.get('payment_method', 'UPI (970403****@fam)').strip()
     razorpay_payment_id = request.form.get('razorpay_payment_id', '').strip()
     razorpay_order_id = request.form.get('razorpay_order_id', '').strip()
     razorpay_signature = request.form.get('razorpay_signature', '').strip()
-
-    # Direct UPI payload
     upi_utr = request.form.get('upi_utr', '').strip()
-
-    if not address_line or not city or not state or not pincode:
-        flash('All delivery address fields are required.', 'danger')
-        return redirect(url_for('checkout'))
 
     # Strict Validation of Payment - NO BYPASS!
     payment_status = 'completed'
@@ -1877,14 +1871,25 @@ def payment_process():
     final_method_name = payment_method
 
     if 'UPI' in payment_method:
-        # User paid directly via UPI to 9704039617@fam
-        # They MUST provide the authentic 12-digit UTR from PhonePe/GooglePay/Paytm
-        if not upi_utr or not re.match(r'^\d{12}$', upi_utr):
-            flash('Payment Verification Failed: Please enter your authentic 12-digit UPI Reference / UTR Number from your UPI app receipt to confirm your payment.', 'danger')
+        # Genuine UPI Payment Verification:
+        # Requires authentic 12-digit Bank Reference Number (UTR) from PhonePe / Google Pay / Paytm receipt
+        def is_valid_utr(val: str) -> bool:
+            if not val or not re.match(r'^\d{12}$', val):
+                return False
+            # Reject repetitive dummy numbers like 000000000000, 111111111111, 121212121212
+            if len(set(val)) <= 2:
+                return False
+            # Reject sequential numbers like 123456789012, 987654321098
+            if val in "01234567890123456789" or val in "98765432109876543210":
+                return False
+            return True
+
+        if not is_valid_utr(upi_utr):
+            flash('Payment Required: Please complete the payment and enter the authentic 12-digit UPI UTR reference number from your bank receipt to place your order.', 'danger')
             return redirect(url_for('checkout'))
         
         final_txn_id = f"UPI-UTR-{upi_utr}"
-        final_method_name = "UPI (970403****@fam)"
+        final_method_name = f"UPI ({Config.STORE_UPI_ID})"
         payment_status = 'completed'
 
     elif 'Cash on Delivery' in payment_method or payment_method == 'COD':
@@ -1940,12 +1945,15 @@ def payment_process():
 
         total_amount = sum(float(item['price']) * item['quantity'] for item in cart_items)
 
-        # 2. Check for duplicate transaction ID
-        cursor.execute("SELECT payment_id FROM payments WHERE transaction_id = %s", (final_txn_id,))
+        # 2. Check for duplicate transaction ID (prevent replay / reuse of UTR)
+        cursor.execute("""
+            SELECT payment_id FROM payments 
+            WHERE transaction_id = %s OR transaction_id = %s OR transaction_id LIKE %s
+        """, (final_txn_id, upi_utr, f"%{upi_utr}%"))
         if cursor.fetchone():
             cursor.close()
             conn.close()
-            flash('This transaction or UPI UTR reference number has already been recorded for an order.', 'warning')
+            flash('Payment Verification Error: This UPI UTR / Transaction reference number has already been recorded for an existing order. Duplicate transaction references are not permitted.', 'warning')
             return redirect(url_for('checkout'))
 
         # 3. Save shipping address

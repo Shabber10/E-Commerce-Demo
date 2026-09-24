@@ -1,96 +1,158 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Sign-Up (OTP Verification) - E-Commerce Store{% endblock %}
+{% block title %}Admin Sign-Up - E-Commerce Demo{% endblock %}
 
 {% block content %}
 <div class="auth-page">
-    <div class="auth-card" style="border-top: 4px solid #c53030; max-width: 480px;">
+    <div class="auth-card admin-card" style="max-width: 490px;">
         <div class="auth-header">
-            <h1 class="auth-title" style="color: #c53030;">&#9881; Admin Registration</h1>
-            <p class="auth-subtitle">Create a new store administrator account with Email OTP verification</p>
+            <div class="auth-badge-wrapper">
+                <span class="auth-badge admin">
+                    <span class="badge-dot"></span> Administrator Provisioning
+                </span>
+            </div>
+
+            <div class="auth-icon-wrap admin">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+            </div>
+
+            <h1 class="auth-title">Admin Registration</h1>
+            <p class="auth-subtitle">Create a verified administrator account with two-step email authentication</p>
         </div>
 
-        <div style="background-color: #fff8e1; border: 1px solid #ffe082; padding: 10px 14px; border-radius: 4px; font-size: 13px; color: #795548; margin-bottom: 18px;">
-            &#9432; <b>Security Notice:</b> A 6-digit one-time password (OTP) will be sent to your registered email to verify this administrator setup.
+        <div style="background-color: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: 12px; font-size: 13px; color: #9f1239; margin-bottom: 22px; display: flex; align-items: flex-start; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 1px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span><b>Security Protocol:</b> A 6-digit one-time password (OTP) will be dispatched to your email in the next step to confirm your credentials.</span>
         </div>
 
         <form action="{{ url_for('admin_register') }}" method="POST">
             <div class="form-group">
                 <label class="form-label">Full Name</label>
-                <input 
-                    type="text" 
-                    name="full_name" 
-                    value="{{ full_name or '' }}" 
-                    placeholder="e.g. John Admin" 
-                    required 
-                    autocomplete="name"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </span>
+                    <input 
+                        type="text" 
+                        name="full_name" 
+                        value="{{ full_name or '' }}" 
+                        placeholder="e.g. John Doe" 
+                        required 
+                        autocomplete="name"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Admin Email Address</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    value="{{ email or '' }}" 
-                    placeholder="admin@example.com" 
-                    required 
-                    autocomplete="email"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value="{{ email or '' }}" 
+                        placeholder="admin@company.com" 
+                        required 
+                        autocomplete="email"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Phone Number</label>
-                <input 
-                    type="text" 
-                    name="phone" 
-                    value="{{ phone or '' }}" 
-                    placeholder="10-digit mobile number" 
-                    required 
-                    autocomplete="tel"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </span>
+                    <input 
+                        type="text" 
+                        name="phone" 
+                        value="{{ phone or '' }}" 
+                        placeholder="10-digit mobile number" 
+                        required 
+                        autocomplete="tel"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Admin Password (Min. 6 characters)</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    placeholder="Create secure admin password" 
-                    required 
-                    minlength="6"
-                    autocomplete="new-password"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Create strong password" 
+                        required 
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Confirm Password</label>
-                <input 
-                    type="password" 
-                    name="confirm_password" 
-                    placeholder="Re-type password" 
-                    required 
-                    minlength="6"
-                    autocomplete="new-password"
-                >
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </span>
+                    <input 
+                        type="password" 
+                        name="confirm_password" 
+                        placeholder="Confirm strong password" 
+                        required 
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+                </div>
             </div>
 
-            <div style="margin-top: 22px;">
-                <button type="submit" class="btn-full" style="background-color: #c53030; border-color: #c53030;">
-                    Send Email OTP &rarr;
+            <div style="margin-top: 24px;">
+                <button type="submit" class="btn-auth-primary admin-btn">
+                    <span>Send Verification Code</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                 </button>
             </div>
         </form>
 
         <div class="auth-footer">
-            <p style="margin-bottom: 8px;">
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #64748b;">
                 Already have an Admin account? 
-                <a href="{{ url_for('admin_login') }}" style="color: #c53030; font-weight: bold;">
+                <a href="{{ url_for('admin_login') }}" style="color: #e11d48; font-weight: 700; text-decoration: none;">
                     Admin Sign In &rarr;
                 </a>
             </p>
             <p style="margin: 0;">
-                <a href="{{ url_for('index') }}">&larr; Return to Store</a>
+                <a href="{{ url_for('index') }}" class="auth-nav-link">&larr; Return to Store Front</a>
             </p>
         </div>
     </div>

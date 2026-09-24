@@ -1,121 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}{% if is_edit %}Edit Product{% else %}Add New Product{% endif %} - Admin{% endblock %}
+{% block title %}{% if is_edit %}Edit Product{% else %}Add New Product{% endif %} - Admin Portal{% endblock %}
 
 {% block content %}
-<p><a href="{{ url_for('admin_products') }}">&larr; Back to Product List</a></p>
+<!-- Admin Navigation Toolbar -->
+<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
+    <a href="{{ url_for('admin_dashboard') }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Admin Dashboard
+    </a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_products') }}">Manage Products</a>
+    <span style="color: #cbd5e1;">/</span>
+    <span class="active">{% if is_edit %}Edit Product{% else %}Add Product{% endif %}</span>
+</div>
 
-<h2>{% if is_edit %}Edit Product: {{ product.product_name }}{% else %}Add New Product{% endif %}</h2>
-<hr>
+<div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+            {% if is_edit %}Edit Product: {{ product.product_name }}{% else %}Publish New Catalog Product{% endif %}
+        </h1>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Configure product specifications, pricing, inventory stock, and high-resolution photo</p>
+    </div>
+    <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">
+        &larr; Back to Catalog
+    </a>
+</div>
 
-<div style="max-width: 650px; margin: 20px 0; padding: 20px; border: 1px solid #ccc; background-color: #fff;">
+<div class="card-box" style="max-width: 680px; margin-bottom: 30px;">
     <form action="" method="POST" enctype="multipart/form-data">
-        <table width="100%" cellpadding="8">
-            <tr>
-                <td width="30%"><b>Product Name:</b></td>
-                <td>
-                    <input 
-                        type="text" 
-                        name="product_name" 
-                        value="{{ product.product_name if product else '' }}" 
-                        required 
-                        style="width: 100%; padding: 6px; box-sizing: border-box;"
-                    >
-                </td>
-            </tr>
+        <div class="form-group">
+            <label class="form-label">Product Name / Title</label>
+            <input 
+                type="text" 
+                name="product_name" 
+                value="{{ product.product_name if product else '' }}" 
+                placeholder="e.g. Wireless Noise-Cancelling Headphones Pro" 
+                required 
+                autofocus
+            >
+        </div>
 
-            <tr>
-                <td><b>Category:</b></td>
-                <td>
-                    <select name="category_id" required style="width: 100%; padding: 6px; box-sizing: border-box;">
-                        <option value="">-- Select Category --</option>
-                        {% for cat in categories %}
-                            <option value="{{ cat.category_id }}" {% if product and product.category_id == cat.category_id %}selected{% endif %}>
-                                {{ cat.category_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </td>
-            </tr>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+                <label class="form-label">Category Classification</label>
+                <select name="category_id" required>
+                    <option value="">-- Choose Category --</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.category_id }}" {% if product and product.category_id == cat.category_id %}selected{% endif %}>
+                            {{ cat.category_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <tr>
-                <td><b>Price (₹):</b></td>
-                <td>
-                    <input 
-                        type="number" 
-                        step="0.01" 
-                        name="price" 
-                        value="{{ product.price if product else '' }}" 
-                        required 
-                        style="width: 100%; padding: 6px; box-sizing: border-box;"
-                    >
-                </td>
-            </tr>
+            <div class="form-group">
+                <label class="form-label">Retail Price (₹)</label>
+                <input 
+                    type="number" 
+                    step="0.01" 
+                    name="price" 
+                    value="{{ product.price if product else '' }}" 
+                    placeholder="999.00" 
+                    required 
+                >
+            </div>
+        </div>
 
-            <tr>
-                <td><b>Initial Stock Quantity:</b></td>
-                <td>
-                    <input 
-                        type="number" 
-                        name="stock_quantity" 
-                        value="{{ product.stock_quantity if product else '10' }}" 
-                        required 
-                        min="0"
-                        style="width: 100%; padding: 6px; box-sizing: border-box;"
-                    >
-                </td>
-            </tr>
+        <div class="form-group">
+            <label class="form-label">Initial Stock Quantity</label>
+            <input 
+                type="number" 
+                name="stock_quantity" 
+                value="{{ product.stock_quantity if product else '10' }}" 
+                required 
+                min="0"
+                placeholder="10"
+            >
+        </div>
 
-            <tr>
-                <td valign="top"><b>Description:</b></td>
-                <td>
-                    <textarea 
-                        name="description" 
-                        rows="4" 
-                        style="width: 100%; padding: 6px; box-sizing: border-box;"
-                    >{{ product.description if product else '' }}</textarea>
-                </td>
-            </tr>
+        <div class="form-group">
+            <label class="form-label">Product Description</label>
+            <textarea 
+                name="description" 
+                rows="4" 
+                placeholder="Provide detailed item features, dimensions, technical specs, or warranty terms..."
+            >{{ product.description if product else '' }}</textarea>
+        </div>
 
-            <tr>
-                <td valign="top"><b>Upload Product Photo:</b></td>
-                <td>
-                    {% if product and product.image_url %}
-                        <div style="margin-bottom: 8px;">
-                            Current photo:<br>
-                            <img src="{{ url_for('uploaded_file', filename=product.image_url) }}" width="90" height="90" style="object-fit: cover; border: 1px solid #ccc;"><br>
-                            <small>Upload new file below only to replace it:</small>
-                        </div>
-                    {% endif %}
-                    <input type="file" name="product_image" accept="image/*">
-                    <br><small style="color: #666;">Allowed file types: JPG, PNG, WEBP, GIF</small>
-                </td>
-            </tr>
-
-            {% if is_edit %}
-                <tr>
-                    <td><b>Status:</b></td>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="is_active" value="1" {% if product.is_active %}checked{% endif %}>
-                            Active / Visible in Store
-                        </label>
-                    </td>
-                </tr>
+        <div class="form-group">
+            <label class="form-label">Product Photo</label>
+            {% if product and product.image_url %}
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px; padding: 10px; background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px;">
+                    <div style="width: 60px; height: 60px; border-radius: 8px; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img src="{{ url_for('uploaded_file', filename=product.image_url) }}" alt="Current Photo" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                    </div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">Current Image Saved</div>
+                        <div style="font-size: 11.5px; color: #64748b;">Upload a new image below only if you want to replace it.</div>
+                    </div>
+                </div>
             {% endif %}
+            <input 
+                type="file" 
+                name="product_image" 
+                accept="image/*" 
+                style="padding: 8px; border: 1.5px dashed var(--slate-300); height: auto; border-radius: 10px; background: var(--slate-50);"
+            >
+            <span style="font-size: 11.5px; color: #94a3b8; margin-top: 4px; display: block;">Allowed file formats: JPG, PNG, WEBP, GIF (Max: 5MB)</span>
+        </div>
 
-            <tr>
-                <td></td>
-                <td>
-                    <br>
-                    <button type="submit" style="padding: 8px 20px; font-weight: bold; cursor: pointer;">
-                        {% if is_edit %}Save Changes{% else %}Upload & Save Product{% endif %}
-                    </button>
-                    &nbsp;&nbsp;
-                    <a href="{{ url_for('admin_products') }}"><button type="button" style="padding: 8px 15px;">Cancel</button></a>
-                </td>
-            </tr>
-        </table>
+        {% if is_edit %}
+            <div class="form-group" style="margin-top: 14px; padding: 12px 14px; background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; font-weight: 700; font-size: 13.5px; color: #0f172a;">
+                    <input type="checkbox" name="is_active" value="1" {% if product.is_active %}checked{% endif %} style="width: 18px; height: 18px;">
+                    <span>Active &amp; Visible in Store Catalog</span>
+                </label>
+            </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--slate-100);">
+            <button type="submit" class="btn btn-admin" style="height: 46px; padding: 0 26px; font-size: 14.5px;">
+                {% if is_edit %}Save Changes &rarr;{% else %}Publish Product &rarr;{% endif %}
+            </button>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-secondary" style="height: 46px;">
+                Cancel
+            </a>
+        </div>
     </form>
 </div>
 {% endblock %}

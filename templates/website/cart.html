@@ -1,86 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Shopping Cart - E-Commerce Store{% endblock %}
+{% block title %}Shopping Cart - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<h2>Your Shopping Cart</h2>
-<hr>
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Shopping Cart</h1>
+    <p style="color: #64748b; font-size: 14px; margin: 0;">Review your selected items and proceed to secure checkout</p>
+</div>
 
 {% if items %}
-    <div class="table-responsive">
-        <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse;">
-            <thead>
-                <tr bgcolor="#f0f0f0">
-                    <th width="80">Photo</th>
-                    <th>Product Name</th>
-                    <th width="100">Unit Price</th>
-                    <th width="140">Quantity</th>
-                    <th width="120">Subtotal</th>
-                    <th width="80">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                    <tr>
-                        <td align="center">
-                            {% if item.image_url %}
-                                <img src="{{ url_for('uploaded_file', filename=item.image_url) }}" alt="{{ item.product_name }}" width="60" height="60" style="object-fit: cover; border: 1px solid #ccc;">
-                            {% else %}
-                                <small>No photo</small>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <b><a href="{{ url_for('product_detail', product_id=item.product_id) }}">{{ item.product_name }}</a></b>
-                        </td>
-                        <td align="center">₹{{ "%.2f"|format(item.price) }}</td>
-                        <td align="center">
-                            <form action="{{ url_for('cart_update') }}" method="POST" style="display: inline-flex; align-items: center; gap: 5px;">
-                                <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
-                                <button type="submit" name="action" value="decrease" style="padding: 2px 7px;">-</button>
-                                <span style="font-weight: bold; padding: 0 5px;">{{ item.quantity }}</span>
-                                <button type="submit" name="action" value="increase" style="padding: 2px 7px;">+</button>
-                            </form>
-                        </td>
-                        <td align="center"><b>₹{{ "%.2f"|format(item.subtotal) }}</b></td>
-                        <td align="center">
-                            <form action="{{ url_for('cart_remove', cart_item_id=item.cart_item_id) }}" method="POST" style="display: inline;">
-                                <button type="submit" style="color: red; border: none; background: none; text-decoration: underline; cursor: pointer;">
-                                    Remove
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-                <tr bgcolor="#fafafa">
-                    <td colspan="4" align="right"><h3>Total Amount:</h3></td>
-                    <td align="center"><h3>₹{{ "%.2f"|format(total_amount) }}</h3></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <br>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div class="cart-layout">
+        <!-- Left: Items Table / List -->
         <div>
-            <a href="{{ url_for('index') }}">&larr; Continue Shopping</a> | 
-            <form action="{{ url_for('cart_clear') }}" method="POST" style="display: inline;" onsubmit="return confirm('Clear all items from your cart?');">
-                <button type="submit" style="color: red; border: none; background: none; text-decoration: underline; cursor: pointer;">
-                    Empty Entire Cart
-                </button>
-            </form>
+            <div class="table-responsive" style="margin-top: 0; box-shadow: var(--shadow-sm);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="80">Item</th>
+                            <th>Product</th>
+                            <th width="110">Unit Price</th>
+                            <th width="130" style="text-align: center;">Quantity</th>
+                            <th width="110" style="text-align: right;">Subtotal</th>
+                            <th width="60" style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div style="width: 58px; height: 58px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                        {% if item.image_url %}
+                                            <img src="{{ url_for('uploaded_file', filename=item.image_url) }}" alt="{{ item.product_name }}" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                                        {% else %}
+                                            <span style="font-size: 10px; color: #94a3b8;">No Image</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('product_detail', product_id=item.product_id) }}" style="font-weight: 700; color: #0f172a; font-size: 14.5px; display: block; margin-bottom: 4px;">
+                                        {{ item.product_name }}
+                                    </a>
+                                    <span style="font-size: 12px; color: #059669; font-weight: 600;">● In Stock &bull; Ready to ship</span>
+                                </td>
+                                <td style="font-weight: 600; color: #334155;">
+                                    ₹{{ "%.2f"|format(item.price) }}
+                                </td>
+                                <td align="center">
+                                    <form action="{{ url_for('cart_update') }}" method="POST" style="margin: 0;">
+                                        <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                                        <div class="qty-stepper">
+                                            <button type="submit" name="action" value="decrease" title="Decrease">&minus;</button>
+                                            <span>{{ item.quantity }}</span>
+                                            <button type="submit" name="action" value="increase" title="Increase">+</button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td style="text-align: right; font-weight: 800; color: #0f172a; font-size: 15px;">
+                                    ₹{{ "%.2f"|format(item.subtotal) }}
+                                </td>
+                                <td align="center">
+                                    <form action="{{ url_for('cart_remove', cart_item_id=item.cart_item_id) }}" method="POST" style="margin: 0;">
+                                        <button type="submit" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 6px; border-radius: 6px; transition: all 0.15s ease;" title="Remove Item" onmouseover="this.style.color='#ef4444'; this.style.backgroundColor='#fee2e2';" onmouseout="this.style.color='#94a3b8'; this.style.backgroundColor='transparent';">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    &larr; Continue Shopping
+                </a>
+                <form action="{{ url_for('cart_clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to empty your entire shopping cart?');" style="margin: 0;">
+                    <button type="submit" class="btn btn-danger" style="font-size: 13px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        <span>Empty Cart</span>
+                    </button>
+                </form>
+            </div>
         </div>
+
+        <!-- Right: Order Summary Card -->
         <div>
-            <a href="{{ url_for('checkout') }}">
-                <button style="padding: 10px 25px; font-size: 15px; font-weight: bold; background-color: #2e7d32; color: #fff; border: none; cursor: pointer;">
-                    Proceed to Checkout &rarr;
-                </button>
-            </a>
+            <div class="order-summary-card">
+                <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                    Order Summary
+                </h3>
+
+                <div class="summary-row">
+                    <span>Items Subtotal:</span>
+                    <span style="font-weight: 700; color: #0f172a;">₹{{ "%.2f"|format(total_amount) }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping Charges:</span>
+                    <span style="font-weight: 700; color: #059669;">FREE</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Estimated Tax (GST):</span>
+                    <span style="color: #64748b;">Included</span>
+                </div>
+
+                <div class="summary-row total">
+                    <span>Total Payable:</span>
+                    <span style="color: #0f172a;">₹{{ "%.2f"|format(total_amount) }}</span>
+                </div>
+
+                <div style="margin-top: 22px;">
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary" style="width: 100%; height: 48px; font-size: 15px;">
+                        <span>Proceed to Checkout</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+
+                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #64748b;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Safe &amp; Secure 256-Bit SSL Checkout</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Instant UPI &amp; Razorpay Integration</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 {% else %}
-    <p>Your shopping cart is currently empty.</p>
-    <p><a href="{{ url_for('index') }}"><b>&raquo; Browse Products and Start Shopping</b></a></p>
+    <div style="border: 1px solid var(--slate-200); padding: 56px 24px; background-color: #ffffff; text-align: center; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); max-width: 520px; margin: 30px auto;">
+        <div style="width: 64px; height: 64px; border-radius: 20px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        </div>
+        <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Your Shopping Cart is Empty</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 24px; line-height: 1.5;">
+            Explore our vast catalog of top items, verified electronics, and fashion merchandise to add items to your cart.
+        </p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary" style="height: 44px; padding: 0 24px;">
+            Browse Products &amp; Start Shopping &rarr;
+        </a>
+    </div>
 {% endif %}
 {% endblock %}

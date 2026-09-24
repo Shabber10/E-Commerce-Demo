@@ -1,68 +1,101 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Manage Categories{% endblock %}
+{% block title %}Manage Categories - E-Commerce Demo Admin{% endblock %}
 
 {% block content %}
-<p><a href="{{ url_for('admin_dashboard') }}">&larr; Back to Admin Panel</a></p>
+<!-- Admin Navigation Toolbar -->
+<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
+    <a href="{{ url_for('admin_dashboard') }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Admin Dashboard
+    </a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_products') }}">Manage Products</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_product_add') }}">+ Add Product</a>
+    <span style="color: #cbd5e1;">/</span>
+    <span class="active">Categories</span>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_orders') }}">Orders</a>
+</div>
 
-<h2>Category Management</h2>
-<hr>
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Category Hierarchies</h1>
+    <p style="color: #64748b; font-size: 14px; margin: 0;">Organize and manage departmental store classifications and item allocations</p>
+</div>
 
-<table width="100%" cellpadding="15">
-    <tr>
-        <td width="55%" valign="top">
-            <h3>Existing Categories</h3>
-            {% if categories %}
-                <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse;">
-                    <thead>
-                        <tr bgcolor="#f0f0f0">
-                            <th width="50">ID</th>
-                            <th>Category Name</th>
-                            <th width="80">Products</th>
-                            <th width="90">Action</th>
+<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start;">
+    <!-- Left: Existing Categories Table -->
+    <div>
+        <div class="table-responsive" style="margin-top: 0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">ID</th>
+                        <th>Category Name</th>
+                        <th width="120" style="text-align: center;">Assigned Items</th>
+                        <th width="90" style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                        <tr>
+                            <td style="font-family: monospace; font-size: 12px; color: #94a3b8;">
+                                #{{ cat.category_id }}
+                            </td>
+                            <td style="font-weight: 700; color: #0f172a; font-size: 14.5px;">
+                                {{ cat.category_name }}
+                            </td>
+                            <td align="center">
+                                <span class="badge badge-info">
+                                    {{ cat.product_count or 0 }} products
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <form action="{{ url_for('admin_category_delete', category_id=cat.category_id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Delete this category? Items under it may need reassignment.');">
+                                    <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for cat in categories %}
-                            <tr>
-                                <td align="center">{{ cat.category_id }}</td>
-                                <td><b>{{ cat.category_name }}</b></td>
-                                <td align="center">{{ cat.product_count or 0 }}</td>
-                                <td align="center">
-                                    <form action="{{ url_for('admin_category_delete', category_id=cat.category_id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this category?');">
-                                        <button type="submit" style="color: red; border: none; background: none; text-decoration: underline; cursor: pointer;">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>No categories found.</p>
-            {% endif %}
-        </td>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #94a3b8;">
+                                No categories created yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <td width="45%" valign="top">
-            <div style="border: 1px solid #ccc; padding: 15px; background-color: #fff;">
-                <h3>Add New Category</h3>
-                <form action="{{ url_for('admin_categories') }}" method="POST">
-                    <p><b>Category Name:</b></p>
+    <!-- Right: Add New Category Card -->
+    <div>
+        <div class="card-box">
+            <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
+                Add New Category
+            </h3>
+            <form action="{{ url_for('admin_categories') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Classification Title</label>
                     <input 
                         type="text" 
                         name="category_name" 
-                        placeholder="e.g. Sports & Fitness" 
+                        placeholder="e.g. Smart Wearables & Audio" 
                         required 
-                        style="width: 100%; padding: 7px; box-sizing: border-box;"
                     >
-                    <br><br>
-                    <button type="submit" style="padding: 8px 18px; font-weight: bold; cursor: pointer;">
-                        Add Category
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-admin" style="width: 100%; height: 44px;">
+                        <span>Create Category &rarr;</span>
                     </button>
-                </form>
-            </div>
-        </td>
-    </tr>
-</table>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

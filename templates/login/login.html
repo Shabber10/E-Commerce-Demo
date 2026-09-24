@@ -1,58 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In - E-Commerce Store{% endblock %}
+{% block title %}Sign In - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<div style="max-width: 450px; margin: 30px auto; padding: 20px; border: 1px solid #ccc; background-color: #fff;">
-    <h2 align="center">Sign In to Your Account</h2>
-    <hr>
-    <br>
+<div class="auth-page">
+    <div class="auth-card user-card">
+        <div class="auth-header">
+            <div class="auth-badge-wrapper">
+                <span class="auth-badge user">
+                    <span class="badge-dot" style="background: #2563eb;"></span> Secure Customer Gateway
+                </span>
+            </div>
 
-    <form action="{{ url_for('login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}" method="POST">
-        <table width="100%" cellpadding="8">
-            <tr>
-                <td><b>Email Address:</b></td>
-            </tr>
-            <tr>
-                <td>
+            <div class="auth-icon-wrap user">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to manage your shopping cart, orders, and addresses</p>
+        </div>
+
+        <form action="{{ url_for('login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
                     <input 
                         type="email" 
                         name="email" 
                         value="{{ email or request.args.get('email', '') }}" 
-                        placeholder="Enter email" 
+                        placeholder="you@example.com" 
                         required 
-                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                        autocomplete="email"
+                        autofocus
                     >
-                </td>
-            </tr>
-            <tr>
-                <td><b>Password:</b></td>
-            </tr>
-            <tr>
-                <td>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                    <label class="form-label" style="margin-bottom: 0;">Password</label>
+                    <a href="{{ url_for('forgot_password') }}" style="font-size: 12.5px; font-weight: 600; color: #2563eb;">Forgot password?</a>
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
                     <input 
                         type="password" 
                         name="password" 
-                        placeholder="Enter password" 
+                        placeholder="Enter your account password" 
                         required 
-                        style="width: 100%; padding: 8px; box-sizing: border-box;"
+                        autocomplete="current-password"
                     >
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button type="submit" style="width: 100%; padding: 10px; font-weight: bold; cursor: pointer;">
-                        Sign In
-                    </button>
-                </td>
-            </tr>
-        </table>
-    </form>
+                </div>
+            </div>
 
-    <br>
-    <div align="center">
-        <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
-        <p>Don't have an account? <a href="{{ url_for('register') }}"><b>Create an Account (Sign Up)</b></a></p>
+            <div style="margin-top: 24px;">
+                <button type="submit" class="btn-auth-primary user-btn">
+                    <span>Sign In to Account</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p style="margin: 0 0 10px 0; font-size: 13.5px; color: #64748b;">
+                Don't have an account yet? 
+                <a href="{{ url_for('register') }}" style="color: #2563eb; font-weight: 700;">
+                    Create Free Account &rarr;
+                </a>
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; font-size: 13px;">
+                <a href="{{ url_for('index') }}" class="auth-nav-link">&larr; Return to Catalog</a>
+                <span style="color: #cbd5e1;">&bull;</span>
+                <a href="{{ url_for('admin_login') }}" class="auth-nav-link">Admin Sign In</a>
+            </div>
+
+            <div class="auth-trust-footer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>End-to-End SSL Encrypted Authentication</span>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

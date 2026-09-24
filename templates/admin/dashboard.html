@@ -1,138 +1,193 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - E-Commerce Store{% endblock %}
+{% block title %}Admin Command Center - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<table width="100%" cellpadding="5">
-    <tr>
-        <td>
-            <h2>Admin Control Panel</h2>
-            <p>Administrator Account: <b>{{ current_user.name }}</b> ({{ current_user.email }})</p>
-        </td>
-        <td align="right">
-            <a href="{{ url_for('index') }}"><button type="button" style="padding: 6px 14px; cursor: pointer;">&larr; View Live Store</button></a>
-        </td>
-    </tr>
-</table>
-<hr>
-
-<!-- Navigation Menu Table -->
-<h3>Admin Navigation Menu</h3>
-<div class="table-responsive">
-    <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse; background-color: #f9f9f9; text-align: center;">
-        <tr>
-            <th width="20%">
-                <a href="{{ url_for('admin_products') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
-                    &#128230; <b>Manage Products</b>
-                </a>
-            </th>
-            <th width="20%">
-                <a href="{{ url_for('admin_product_add') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
-                    &#10010; <b>Add Product</b>
-                </a>
-            </th>
-            <th width="20%">
-                <a href="{{ url_for('admin_categories') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
-                    &#128194; <b>Categories</b>
-                </a>
-            </th>
-            <th width="20%">
-                <a href="{{ url_for('admin_orders') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
-                    &#128221; <b>Customer Orders</b>
-                </a>
-            </th>
-            <th width="20%">
-                <a href="{{ url_for('admin_profile') }}" style="text-decoration: none; color: #0c2340; font-size: 14px;">
-                    &#128100; <b>Admin Profile</b>
-                </a>
-            </th>
-        </tr>
-    </table>
+<!-- Admin Navigation Toolbar -->
+<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
+    <span class="active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Admin Dashboard
+    </span>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_products') }}">Manage Products</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_product_add') }}">+ Add Product</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_categories') }}">Categories</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_orders') }}">Customer Orders</a>
+    <span style="color: #cbd5e1;">/</span>
+    <a href="{{ url_for('admin_profile') }}">Admin Profile</a>
 </div>
 
-<br>
-
-<!-- Store Statistics Table -->
-<h3>Store Overview &amp; Key Metrics</h3>
-<div class="table-responsive">
-    <table width="100%" border="1" cellpadding="14" style="border-collapse: collapse; text-align: center;">
-        <thead>
-            <tr bgcolor="#f0f0f0">
-                <th width="25%">Total Active Products</th>
-                <th width="25%">Total Categories</th>
-                <th width="25%">Total Orders Placed</th>
-                <th width="25%">Registered Customers</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <h1 style="margin: 5px 0;">{{ total_products }}</h1>
-                    <small><a href="{{ url_for('admin_products') }}">View all products &rarr;</a></small>
-                </td>
-                <td>
-                    <h1 style="margin: 5px 0;">{{ total_categories }}</h1>
-                    <small><a href="{{ url_for('admin_categories') }}">View all categories &rarr;</a></small>
-                </td>
-                <td>
-                    <h1 style="margin: 5px 0;">{{ total_orders }}</h1>
-                    <small><a href="{{ url_for('admin_orders') }}">View all orders &rarr;</a></small>
-                </td>
-                <td>
-                    <h1 style="margin: 5px 0;">{{ total_users }}</h1>
-                    <small>Active user accounts</small>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<!-- Admin Hero Header -->
+<div class="account-banner" style="border-top: 4px solid var(--admin);">
+    <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: #fff1f2; border: 1px solid #fecdd3; font-size: 11px; font-weight: 700; color: #be123c; text-transform: uppercase; margin-bottom: 8px;">
+            <span class="badge-dot"></span> Administrator Control Center
+        </div>
+        <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+            Store Operations &amp; Metrics
+        </h1>
+        <p style="margin: 0; color: #64748b; font-size: 14px;">
+            Signed in as <b>{{ current_user.name }}</b> ({{ current_user.email }})
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span>Live Storefront</span>
+        </a>
+        <a href="{{ url_for('admin_product_add') }}" class="btn btn-admin">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Add Product</span>
+        </a>
+    </div>
 </div>
 
-<br>
+<!-- 4 Key Executive Stat Cards -->
+<h3 style="margin-bottom: 14px;">Store Performance Metrics</h3>
+<div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));">
+    <!-- Active Products -->
+    <div class="stat-card">
+        <div class="stat-icon-wrap red">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="stat-value">{{ total_products }}</div>
+            <div class="stat-label">Active Products</div>
+            <a href="{{ url_for('admin_products') }}" style="font-size: 12px; font-weight: 700; color: #e11d48; display: inline-block; margin-top: 4px;">
+                Manage Inventory &rarr;
+            </a>
+        </div>
+    </div>
 
-<!-- Quick Action Operations Table -->
-<h3>Admin Quick Action Directory</h3>
-<div class="table-responsive">
-    <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse;">
-        <thead>
-            <tr bgcolor="#f0f0f0">
-                <th width="50" align="center">#</th>
-                <th width="220">Operation Name</th>
-                <th>Description</th>
-                <th width="150" align="center">Action Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td align="center">1</td>
-                <td><b>Upload New Product</b></td>
-                <td>Add a new catalog product with name, price, stock, and upload product photo.</td>
-                <td align="center"><a href="{{ url_for('admin_product_add') }}"><button style="padding: 5px 12px; cursor: pointer;">Upload Product</button></a></td>
-            </tr>
-            <tr>
-                <td align="center">2</td>
-                <td><b>Product Catalog List</b></td>
-                <td>View all products in tabular format, update inventory, edit info, or delete items.</td>
-                <td align="center"><a href="{{ url_for('admin_products') }}"><button style="padding: 5px 12px; cursor: pointer;">Product Table</button></a></td>
-            </tr>
-            <tr>
-                <td align="center">3</td>
-                <td><b>Category Management</b></td>
-                <td>Create new product classifications and view items per category.</td>
-                <td align="center"><a href="{{ url_for('admin_categories') }}"><button style="padding: 5px 12px; cursor: pointer;">Categories Table</button></a></td>
-            </tr>
-            <tr>
-                <td align="center">4</td>
-                <td><b>Order Processing</b></td>
-                <td>Track customer orders, check Razorpay payment IDs, and update order dispatch status.</td>
-                <td align="center"><a href="{{ url_for('admin_orders') }}"><button style="padding: 5px 12px; cursor: pointer;">Orders Table</button></a></td>
-            </tr>
-            <tr>
-                <td align="center">5</td>
-                <td><b>Admin Profile &amp; Settings</b></td>
-                <td>Manage administrator account name, email, credentials, and profile image upload.</td>
-                <td align="center"><a href="{{ url_for('admin_profile') }}"><button style="padding: 5px 12px; cursor: pointer;">Admin Profile</button></a></td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Categories -->
+    <div class="stat-card">
+        <div class="stat-icon-wrap blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="stat-value">{{ total_categories }}</div>
+            <div class="stat-label">Categories Configured</div>
+            <a href="{{ url_for('admin_categories') }}" style="font-size: 12px; font-weight: 700; color: #2563eb; display: inline-block; margin-top: 4px;">
+                View Categories &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="stat-card">
+        <div class="stat-icon-wrap green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        </div>
+        <div>
+            <div class="stat-value">{{ total_orders }}</div>
+            <div class="stat-label">Total Customer Orders</div>
+            <a href="{{ url_for('admin_orders') }}" style="font-size: 12px; font-weight: 700; color: #059669; display: inline-block; margin-top: 4px;">
+                Process Orders &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Registered Customers -->
+    <div class="stat-card">
+        <div class="stat-icon-wrap purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Registered Customers</div>
+            <span style="font-size: 12px; color: #64748b; display: inline-block; margin-top: 4px;">
+                Active accounts
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Management Grid -->
+<h3 style="margin-bottom: 6px;">Administrative Operations</h3>
+<p style="color: #64748b; font-size: 13.5px; margin-bottom: 18px;">Direct shortcuts for inventory provisioning and customer management:</p>
+
+<div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+    <!-- Products -->
+    <div class="card-box" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <h4 style="margin-bottom: 6px;">Product Catalog (CRUD)</h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+                View product inventory, update photos, edit pricing, or archive discontinued items.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary" style="width: 100%;">
+            Manage Products &rarr;
+        </a>
+    </div>
+
+    <!-- Add Product -->
+    <div class="card-box" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+            <h4 style="margin-bottom: 6px;">Add New Item</h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+                Create and publish new items with photo uploads, category tagging, and stock quantities.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_product_add') }}" class="btn btn-secondary" style="width: 100%;">
+            Upload Product &rarr;
+        </a>
+    </div>
+
+    <!-- Categories -->
+    <div class="card-box" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h4 style="margin-bottom: 6px;">Categories</h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+                Organize catalog hierarchies, add new department classifications, and audit item counts.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_categories') }}" class="btn btn-secondary" style="width: 100%;">
+            Category Manager &rarr;
+        </a>
+    </div>
+
+    <!-- Orders -->
+    <div class="card-box" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <h4 style="margin-bottom: 6px;">Order Dispatch</h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+                Monitor customer orders, review payment IDs, and update fulfillment &amp; delivery statuses.
+            </p>
+        </div>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary" style="width: 100%;">
+            Manage Orders &rarr;
+        </a>
+    </div>
 </div>
 {% endblock %}
