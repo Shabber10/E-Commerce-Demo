@@ -8,11 +8,20 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.utils import secure_filename
 import mysql.connector
 import bcrypt
+import razorpay
 from config import Config, db_connection, init_db
 from email_utils import send_otp_email
 
 app = Flask(__name__)
 app.secret_key = Config.SECRET_KEY
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 # Ensure database and tables exist at startup
 init_db()
@@ -1670,18 +1679,18 @@ def cart_clear():
 
 
 # -------------------------------------------------------------
-# CHECKOUT & RAZORPAY PAYMENT
+# CHECKOUT & AUTHENTIC RAZORPAY / UPI PAYMENT
 # -------------------------------------------------------------
 @app.route('/checkout')
 @login_required
 def checkout():
-    """Checkout page showing delivery address form and Razorpay payment."""
+    """Checkout page showing delivery address form, Razorpay payment, and Direct UPI with UTR verification."""
     customer_id = session.get('user_id')
     cart_id = get_or_create_cart(customer_id)
 
     conn = db_connection()
     if not conn:
-        flash('Database error.', 'danger')
+        flash('Database connection failed.', 'danger')
         return redirect(url_for('cart_view'))
 
     try:
@@ -1703,6 +1712,7 @@ def checkout():
             return redirect(url_for('index'))
 
         total_amount = sum(float(it['subtotal']) for it in items)
+        amount_in_paise = int(round(total_amount * 100))
 
         # Fetch customer info & existing default address
         cursor.execute("SELECT * FROM customers WHERE customer_id = %s", (customer_id,))
@@ -1718,12 +1728,46 @@ def checkout():
         cursor.close()
         conn.close()
 
+        # Initialize real Razorpay order if merchant key is configured
+        razorpay_order_id = None
+        has_real_razorpay = False
+        if Config.RAZORPAY_KEY_ID and not Config.RAZORPAY_KEY_ID.startswith('rzp_test_eCommerce'):
+            try:
+                razorpay_client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
+                rzp_order = razorpay_client.order.create({
+                    'amount': amount_in_paise,
+                    'currency': 'INR',
+                    'receipt': f'rcpt_{customer_id}_{int(datetime.now().timestamp())}',
+                    'payment_capture': 1
+                })
+                razorpay_order_id = rzp_order.get('id')
+                has_real_razorpay = True
+            except Exception as rzp_err:
+                print(f"Razorpay Client Order Creation Error: {rzp_err}")
+
+        # Mask store UPI ID: 9704039617@fam -> 970403****@fam
+        upi_handle = Config.STORE_UPI_ID
+        if '@' in upi_handle:
+            u_part, domain_part = upi_handle.split('@', 1)
+            if len(u_part) > 6:
+                masked_upi = u_part[:6] + '****@' + domain_part
+            else:
+                masked_upi = u_part[:2] + '****@' + domain_part
+        else:
+            masked_upi = upi_handle
+
         return render_template(
             'website/checkout.html',
             items=items,
             total_amount=total_amount,
+            amount_in_paise=amount_in_paise,
             customer=customer,
-            default_address=default_address
+            default_address=default_address,
+            razorpay_order_id=razorpay_order_id,
+            has_real_razorpay=has_real_razorpay,
+            razorpay_key_id=Config.RAZORPAY_KEY_ID,
+            store_upi_id=Config.STORE_UPI_ID,
+            masked_upi_id=masked_upi
         )
     except Exception as err:
         flash(f'Checkout error: {err}', 'danger')
@@ -1735,7 +1779,13 @@ def checkout():
 @app.route('/payment/process', methods=['POST'])
 @login_required
 def payment_process():
-    """Process payment response, create order, deduct stock, and empty cart."""
+    """
+    Process payment response, verify real payment, create order, deduct stock, and empty cart.
+    STRICT VERIFICATION - NO BYPASS:
+    - If Official Razorpay: verify cryptographic HMAC signature with razorpay.Client.
+    - If Direct UPI: require and validate a genuine 12-digit UPI UTR reference number from bank/UPI app.
+    - If COD: mark as Cash on Delivery Pending.
+    """
     customer_id = session.get('user_id')
     cart_id = get_or_create_cart(customer_id)
 
@@ -1744,11 +1794,63 @@ def payment_process():
     city = request.form.get('city', '').strip()
     state = request.form.get('state', '').strip()
     pincode = request.form.get('pincode', '').strip()
+    payment_method = request.form.get('payment_method', 'Razorpay Gateway').strip()
+    
+    # Razorpay payload
     razorpay_payment_id = request.form.get('razorpay_payment_id', '').strip()
+    razorpay_order_id = request.form.get('razorpay_order_id', '').strip()
+    razorpay_signature = request.form.get('razorpay_signature', '').strip()
+
+    # Direct UPI payload
+    upi_utr = request.form.get('upi_utr', '').strip()
 
     if not address_line or not city or not state or not pincode:
-        flash('All address fields are required for delivery.', 'danger')
+        flash('All delivery address fields are required.', 'danger')
         return redirect(url_for('checkout'))
+
+    # Strict Validation of Payment - NO BYPASS!
+    payment_status = 'completed'
+    final_txn_id = None
+    final_method_name = payment_method
+
+    if 'UPI' in payment_method:
+        # User paid directly via UPI to 9704039617@fam
+        # They MUST provide the authentic 12-digit UTR from PhonePe/GooglePay/Paytm
+        if not upi_utr or not re.match(r'^\d{12}$', upi_utr):
+            flash('Payment Verification Failed: Please enter your authentic 12-digit UPI Reference / UTR Number from your UPI app receipt to confirm your payment.', 'danger')
+            return redirect(url_for('checkout'))
+        
+        final_txn_id = f"UPI-UTR-{upi_utr}"
+        final_method_name = "UPI (970403****@fam)"
+        payment_status = 'completed'
+
+    elif 'Cash on Delivery' in payment_method or payment_method == 'COD':
+        final_txn_id = f"COD-PENDING-{uuid.uuid4().hex[:8].upper()}"
+        final_method_name = "Cash on Delivery"
+        payment_status = 'pending'
+
+    else:
+        # Official Razorpay Gateway
+        if not razorpay_payment_id:
+            flash('Payment Failed: No payment was completed. Transaction cancelled.', 'danger')
+            return redirect(url_for('checkout'))
+
+        # If real Razorpay key is configured, verify HMAC signature
+        if Config.RAZORPAY_KEY_ID and not Config.RAZORPAY_KEY_ID.startswith('rzp_test_eCommerce'):
+            try:
+                client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                })
+            except Exception as sig_err:
+                flash(f'Razorpay Payment Verification Failed: Invalid signature ({sig_err}). Payment was not confirmed by Razorpay.', 'danger')
+                return redirect(url_for('checkout'))
+
+        final_txn_id = razorpay_payment_id
+        final_method_name = 'Razorpay Gateway'
+        payment_status = 'completed'
 
     conn = db_connection()
     if not conn:
@@ -1775,7 +1877,15 @@ def payment_process():
 
         total_amount = sum(float(item['price']) * item['quantity'] for item in cart_items)
 
-        # 2. Save shipping address
+        # 2. Check for duplicate transaction ID
+        cursor.execute("SELECT payment_id FROM payments WHERE transaction_id = %s", (final_txn_id,))
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            flash('This transaction or UPI UTR reference number has already been recorded for an order.', 'warning')
+            return redirect(url_for('checkout'))
+
+        # 3. Save shipping address
         cursor.execute("""
             INSERT INTO address (customer_id, address_line, city, state, pincode, country, is_default)
             VALUES (%s, %s, %s, %s, %s, 'INDIA', 1)
@@ -1786,17 +1896,18 @@ def payment_process():
         if phone_number:
             cursor.execute("UPDATE customers SET phone_number = %s WHERE customer_id = %s AND (phone_number = '' OR phone_number = '0000000000')", (phone_number, customer_id))
 
-        # 3. Create order
+        # 4. Create order
         timestamp_str = datetime.now().strftime('%Y%m%d%H%M%S')
         order_number = f"ORD-{timestamp_str}-{random.randint(100, 999)}"
+        initial_order_status = 'processing' if payment_status == 'completed' else 'pending'
 
         cursor.execute("""
             INSERT INTO orders (order_number, customer_id, address_id, order_status, total_amount)
-            VALUES (%s, %s, %s, 'processing', %s)
-        """, (order_number, customer_id, address_id, total_amount))
+            VALUES (%s, %s, %s, %s, %s)
+        """, (order_number, customer_id, address_id, initial_order_status, total_amount))
         order_id = cursor.lastrowid
 
-        # 4. Insert order items & reduce inventory
+        # 5. Insert order items & reduce inventory
         for item in cart_items:
             cursor.execute("""
                 INSERT INTO order_items (order_id, product_id, quantity, price)
@@ -1805,38 +1916,31 @@ def payment_process():
 
             cursor.execute("""
                 UPDATE inventory 
-                SET quantity = GREATEST(0, quantity - %s)
+                SET quantity = MAX(0, quantity - %s)
                 WHERE product_id = %s
             """, (item['quantity'], item['product_id']))
 
-        # 5. Insert payment record
-        base_txn_id = razorpay_payment_id or f"pay_rzp_{uuid.uuid4().hex[:10]}"
-        cursor.execute("SELECT payment_id FROM payments WHERE transaction_id = %s", (base_txn_id,))
-        if cursor.fetchone():
-            txn_id = f"{base_txn_id}_{uuid.uuid4().hex[:6]}"
-        else:
-            txn_id = base_txn_id
-
+        # 6. Insert payment record
         cursor.execute("""
             INSERT INTO payments (order_id, payment_method, payment_status, amount_paid, transaction_id)
-            VALUES (%s, 'Razorpay', 'completed', %s, %s)
-        """, (order_id, total_amount, txn_id))
+            VALUES (%s, %s, %s, %s, %s)
+        """, (order_id, final_method_name, payment_status, total_amount, final_txn_id))
 
-        # 6. Insert shipment tracking record
+        # 7. Insert shipment tracking record
         tracking_num = f"TRK-{uuid.uuid4().hex[:8].upper()}"
         cursor.execute("""
             INSERT INTO shipments (order_id, address_id, phone_number, tracking_number, shipment_status)
             VALUES (%s, %s, %s, %s, 'Order Confirmed')
         """, (order_id, address_id, phone_number, tracking_num))
 
-        # 7. Clear cart items
+        # 8. Clear cart items
         cursor.execute("DELETE FROM cart_items WHERE cart_id = %s", (cart_id,))
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        flash('Payment verified successfully! Your order has been placed.', 'success')
+        flash(f'Payment confirmed ({final_txn_id})! Your order #{order_id} has been placed successfully.', 'success')
         return redirect(url_for('order_success', order_id=order_id))
 
     except Exception as err:

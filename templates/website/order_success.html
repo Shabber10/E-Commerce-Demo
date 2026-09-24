@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Order Placed Successfully - E-Commerce Store{% endblock %}
+{% block title %}Order Placed Successfully - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 30px auto; padding: 25px; border: 2px solid #2e7d32; background-color: #f9fbf9; text-align: center;">
-    <h2 style="color: #2e7d32;">Payment Received &amp; Order Placed!</h2>
-    <p>Your payment via Razorpay has been processed successfully.</p>
+<div style="max-width: 600px; margin: 30px auto; padding: 25px; border: 2px solid #2e7d32; background-color: #f9fbf9; text-align: center; border-radius: 8px;">
+    <h2 style="color: #2e7d32;">Order Placed Successfully!</h2>
+    <p>Your payment via <b>{{ payment.payment_method if payment else 'Online Payment' }}</b> has been processed.</p>
     <hr>
     <br>
 
@@ -19,8 +19,12 @@
             <td>{{ order.order_date.strftime('%d %B %Y, %I:%M %p') if order.order_date else '' }}</td>
         </tr>
         <tr>
-            <td><b>Payment ID (Razorpay):</b></td>
-            <td>{{ payment.transaction_id if payment else 'N/A' }}</td>
+            <td><b>Payment Method:</b></td>
+            <td>{{ payment.payment_method if payment else 'Online Payment' }}</td>
+        </tr>
+        <tr>
+            <td><b>Transaction / Ref ID:</b></td>
+            <td><code>{{ payment.transaction_id if payment else 'N/A' }}</code></td>
         </tr>
         <tr>
             <td><b>Payment Status:</b></td>

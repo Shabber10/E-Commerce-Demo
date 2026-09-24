@@ -1,116 +1,92 @@
 {% extends "base.html" %}
 
-{% block title %}Home - E-Commerce Store{% endblock %}
+{% block title %}Home - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<!-- Top Bar: Single Line Horizontal Categories + Search Bar & Search Button -->
-<div class="top-filter-bar">
-    
-    <!-- Single Line Horizontal Categories -->
-    <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; max-width: 100%; padding-bottom: 4px;">
-        <span style="font-weight: bold; color: #333; margin-right: 4px;">Categories:</span>
-        <a href="{{ url_for('index') }}" style="text-decoration: none; padding: 6px 14px; border: 1px solid {% if not selected_category %}#0c2340{% else %}#ccc{% endif %}; font-size: 13px; border-radius: 4px; {% if not selected_category %}background-color: #0c2340; color: #ffffff; font-weight: bold;{% else %}background-color: #f7f7f7; color: #333333;{% endif %}">
-            All Categories
-        </a>
-        {% for cat in categories %}
-            <a href="{{ url_for('index', category=cat.category_id) }}" style="text-decoration: none; padding: 6px 14px; border: 1px solid {% if selected_category == cat.category_id %}#0c2340{% else %}#ccc{% endif %}; font-size: 13px; border-radius: 4px; {% if selected_category == cat.category_id %}background-color: #0c2340; color: #ffffff; font-weight: bold;{% else %}background-color: #f7f7f7; color: #333333;{% endif %}">
-                {{ cat.category_name }}
-            </a>
-        {% endfor %}
-    </div>
-
-    <!-- Search Bar and Search Button Only -->
-    <form action="{{ url_for('index') }}" method="GET" style="display: flex; gap: 6px; margin: 0; flex-wrap: wrap;">
+<!-- Top Search & Filter Bar (Clean Mobile & Desktop Layout) -->
+<div class="search-and-filter-container">
+    <!-- Top Row: Full width search bar -->
+    <form action="{{ url_for('index') }}" method="GET" class="search-form-row">
         {% if selected_category %}
             <input type="hidden" name="category" value="{{ selected_category }}">
         {% endif %}
         <input 
             type="text" 
             name="search" 
-            placeholder="Search product..." 
+            placeholder="Search products by name or keyword..." 
             value="{{ search_query or '' }}" 
-            style="padding: 6px 10px; width: 190px; border: 1px solid #ccc; font-size: 13px;"
+            class="search-input"
         >
-        <button type="submit" style="padding: 6px 14px; font-weight: bold; cursor: pointer; background-color: #0c2340; color: #ffffff; border: 1px solid #0c2340; font-size: 13px;">
-            Search
-        </button>
+        <button type="submit" class="search-btn">&#128269; Search</button>
         {% if search_query or selected_category %}
-            <a href="{{ url_for('index') }}"><button type="button" style="padding: 6px 10px; cursor: pointer; color: #d32f2f; border: 1px solid #ccc; font-size: 13px; background-color: #fff;">Reset</button></a>
+            <a href="{{ url_for('index') }}" class="reset-btn">Reset</a>
         {% endif %}
     </form>
+
+    <!-- Bottom Row: Sleek Horizontal Category Pills with smooth scrolling -->
+    <div class="category-scroll-strip">
+        <a href="{{ url_for('index') }}" class="cat-chip {% if not selected_category %}active{% endif %}">
+            All Categories
+        </a>
+        {% for cat in categories %}
+            <a href="{{ url_for('index', category=cat.category_id) }}" class="cat-chip {% if selected_category == cat.category_id %}active{% endif %}">
+                {{ cat.category_name }}
+            </a>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- Product Cards Grid -->
 {% if products %}
     <div class="product-grid">
         {% for product in products %}
-            <div class="product-card" style="border: 1px solid #ccc; background-color: #ffffff; width: 100%; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="product-card">
                 
-                <!-- Product Image -->
-                <div>
-                    <a href="{{ url_for('product_detail', product_id=product.product_id) }}" style="text-decoration: none; color: inherit; display: block;">
-                        <div style="text-align: center; height: 180px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; border: 1px solid #eee; margin-bottom: 10px; overflow: hidden;">
-                            {% if product.image_url %}
-                                <img 
-                                    src="{{ url_for('uploaded_file', filename=product.image_url) }}" 
-                                    alt="{{ product.product_name }}" 
-                                    style="max-width: 100%; max-height: 170px; object-fit: contain;"
-                                >
-                            {% else %}
-                                <span style="color: #999; font-size: 12px;">No Photo</span>
-                            {% endif %}
-                        </div>
-
-                        <!-- Category & Title -->
-                        <div style="font-size: 11px; color: #777; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">
-                            {{ product.category_name }}
-                        </div>
-                        <h4 style="margin: 0 0 6px 0; font-size: 14px; line-height: 1.3; min-height: 38px; color: #111;">
-                            {{ product.product_name }}
-                        </h4>
-                    </a>
-                    <p style="font-size: 12px; color: #555; margin: 0 0 10px 0; min-height: 34px; line-height: 1.3;">
-                        {% if product.description %}
-                            {{ product.description[:75] }}{% if product.description|length > 75 %}...{% endif %}
+                <!-- Product Image & Title Link -->
+                <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="product-card-link">
+                    <div class="product-img-box">
+                        {% if product.image_url %}
+                            <img 
+                                src="{{ url_for('uploaded_file', filename=product.image_url) }}" 
+                                alt="{{ product.product_name }}" 
+                                loading="lazy"
+                            >
                         {% else %}
-                            Quality product.
+                            <span class="no-photo-text">No Photo Available</span>
                         {% endif %}
-                    </p>
-                </div>
+                    </div>
+
+                    <!-- Category & Title -->
+                    <div class="product-cat-label">
+                        {{ product.category_name }}
+                    </div>
+                    <h4 class="product-title" title="{{ product.product_name }}">
+                        {{ product.product_name }}
+                    </h4>
+                </a>
 
                 <!-- Price, Stock & Add to Cart -->
-                <div>
-                    <div style="border-top: 1px solid #eee; padding-top: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 16px; font-weight: bold; color: #000;">
+                <div class="product-card-bottom">
+                    <div class="product-price-row">
+                        <span class="product-price">
                             ₹{{ "%.2f"|format(product.price) }}
                         </span>
                         {% if product.stock_quantity > 0 %}
-                            <span style="font-size: 11px; color: green; font-weight: bold;">In Stock ({{ product.stock_quantity }})</span>
+                            <span class="stock-badge in-stock">In Stock ({{ product.stock_quantity }})</span>
                         {% else %}
-                            <span style="font-size: 11px; color: red; font-weight: bold;">Out of Stock</span>
+                            <span class="stock-badge out-stock">Out of Stock</span>
                         {% endif %}
                     </div>
 
                     {% if product.stock_quantity > 0 %}
-                        <form action="{{ url_for('cart_add', product_id=product.product_id) }}" method="POST" onsubmit="return addToCartAjax(event, this, {{ product.product_id }});" style="display: flex; gap: 6px; margin: 0;">
-                            <input 
-                                type="number" 
-                                name="quantity" 
-                                value="1" 
-                                min="1" 
-                                max="{{ product.stock_quantity }}" 
-                                style="width: 45px; padding: 5px; text-align: center; border: 1px solid #ccc;"
-                                title="Quantity"
-                            >
-                            <button 
-                                type="submit" 
-                                style="flex: 1; padding: 7px 10px; font-size: 13px; font-weight: bold; background-color: #0c2340; color: #ffffff; border: 1px solid #0c2340; cursor: pointer;"
-                            >
-                                Add to Cart
+                        <form action="{{ url_for('cart_add', product_id=product.product_id) }}" method="POST" onsubmit="return addToCartAjax(event, this, {{ product.product_id }});" class="product-add-form">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart">
+                                &#128722; Add to Cart
                             </button>
                         </form>
                     {% else %}
-                        <button disabled style="width: 100%; padding: 7px; font-size: 13px; color: #888; background-color: #eee; border: 1px solid #ccc;">
+                        <button disabled class="btn-out-stock">
                             Out of Stock
                         </button>
                     {% endif %}
@@ -120,9 +96,9 @@
         {% endfor %}
     </div>
 {% else %}
-    <div style="border: 1px solid #ccc; padding: 30px; background-color: #fff; text-align: center;">
-        <p>No products available matching your search or category selection.</p>
-        <a href="{{ url_for('index') }}"><button type="button" style="padding: 7px 16px; cursor: pointer;">View All Products</button></a>
+    <div style="border: 1px solid #e2e8f0; padding: 35px; background-color: #fff; text-align: center; border-radius: 8px;">
+        <p style="color: #64748b; font-size: 15px;">No products available matching your search or category selection.</p>
+        <a href="{{ url_for('index') }}"><button type="button" style="padding: 8px 18px; cursor: pointer; border-radius: 4px;">View All Products</button></a>
     </div>
 {% endif %}
 
@@ -130,16 +106,14 @@
 // Day 11 Amazon-style AJAX Add to Cart without page reload
 function addToCartAjax(event, formElement, productId) {
     if (event) event.preventDefault();
-    var qtyInput = formElement ? formElement.querySelector('input[name="quantity"]') : null;
-    var quantity = qtyInput ? qtyInput.value : 1;
     var btn = formElement ? formElement.querySelector('button[type="submit"]') : null;
-    var origText = btn ? btn.innerText : '';
+    var origText = btn ? btn.innerHTML : '';
     if (btn) {
-        btn.innerText = 'Adding...';
+        btn.innerHTML = 'Adding...';
         btn.disabled = true;
     }
 
-    fetch('/cart/add-ajax/' + productId + '?quantity=' + quantity)
+    fetch('/cart/add-ajax/' + productId + '?quantity=1')
         .then(function(res) {
             if (res.status === 401) {
                 window.location.href = "{{ url_for('login') }}?next=" + encodeURIComponent(window.location.pathname);
@@ -154,6 +128,10 @@ function addToCartAjax(event, formElement, productId) {
                 if (badge && data.cart_count !== undefined) {
                     badge.innerText = data.cart_count;
                 }
+                var mobileBadge = document.getElementById("cart-count-mobile");
+                if (mobileBadge && data.cart_count !== undefined) {
+                    mobileBadge.innerText = data.cart_count;
+                }
                 showToast("✔ " + data.message);
             } else {
                 alert(data.message || "Could not add product to cart.");
@@ -165,7 +143,7 @@ function addToCartAjax(event, formElement, productId) {
         })
         .finally(function() {
             if (btn) {
-                btn.innerText = origText;
+                btn.innerHTML = origText;
                 btn.disabled = false;
             }
         });
@@ -183,8 +161,8 @@ function showToast(message) {
         toast.style.backgroundColor = "#0c2340";
         toast.style.color = "#ffffff";
         toast.style.padding = "12px 20px";
-        toast.style.borderRadius = "4px";
-        toast.style.boxShadow = "0 3px 10px rgba(0,0,0,0.2)";
+        toast.style.borderRadius = "6px";
+        toast.style.boxShadow = "0 4px 15px rgba(0,0,0,0.25)";
         toast.style.zIndex = "99999";
         toast.style.fontSize = "14px";
         toast.style.fontWeight = "bold";

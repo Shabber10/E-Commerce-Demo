@@ -73,10 +73,10 @@
     <table class="invoice-header">
         <tr>
             <td valign="top">
-                <h2>E-Commerce Store</h2>
+                <h2>E-Commerce Demo</h2>
                 <p>
                     Online Shopping Project<br>
-                    Email: support@ecommerce-store.local<br>
+                    Email: support@ecommerce-demo.local<br>
                     Website: http://localhost:5000
                 </p>
             </td>
@@ -111,9 +111,9 @@
             <td width="50%" valign="top">
                 <h3>Payment Information:</h3>
                 <p>
-                    <b>Payment Gateway:</b> {{ payment.payment_method if payment else 'Razorpay' }}<br>
+                    <b>Payment Method:</b> {{ payment.payment_method if payment else 'Online Payment' }}<br>
                     <b>Payment Status:</b> <span style="color: green; font-weight: bold;">{{ (payment.payment_status if payment else 'Completed')|upper }}</span><br>
-                    <b>Razorpay Transaction ID:</b> {{ payment.transaction_id if payment else 'N/A' }}<br>
+                    <b>Transaction / Ref ID:</b> <span style="font-family: monospace;">{{ payment.transaction_id if payment else 'N/A' }}</span><br>
                     <b>Payment Date:</b> {{ payment.payment_date.strftime('%d-%m-%Y %H:%M') if payment and payment.payment_date else '' }}
                 </p>
             </td>
@@ -158,7 +158,7 @@
                 <p><small>This is a computer-generated invoice and requires no physical signature.</small></p>
             </td>
             <td align="right">
-                <p><b>E-Commerce Store</b><br><small>Authorized Signatory</small></p>
+                <p><b>E-Commerce Demo</b><br><small>Authorized Signatory</small></p>
             </td>
         </tr>
     </table>

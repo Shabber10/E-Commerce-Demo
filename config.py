@@ -29,9 +29,12 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
-    # Razorpay Configuration
+    # Razorpay Configuration (Get your live/test key from https://dashboard.razorpay.com/app/keys)
     RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_eCommerceKey')
     RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'eCommerceSecretKey')
+
+    # Store UPI ID for Direct UPI Payments
+    STORE_UPI_ID = os.environ.get('STORE_UPI_ID', '9704039617@fam')
 
     # Email / SMTP Configuration (Gmail OTP)
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')

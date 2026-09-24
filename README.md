@@ -1,6 +1,6 @@
-# SmartCart - Flask E-Commerce Web Application
+# E-Commerce Demo - Flask Web Application
 
-SmartCart is a complete full-stack E-Commerce web application developed using **Python Flask**, **MySQL**, **HTML5/CSS3**, and **Vanilla JavaScript**.
+E-Commerce Demo is a complete full-stack E-Commerce web application developed using **Python Flask**, **SQLite / MySQL**, **HTML5/CSS3**, and **Vanilla JavaScript**.
 
 ---
 

