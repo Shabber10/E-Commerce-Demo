@@ -12,7 +12,8 @@
     <div class="cart-layout">
         <!-- Left: Items Table / List -->
         <div>
-            <div class="table-responsive" style="margin-top: 0; box-shadow: var(--shadow-sm);">
+            <!-- Desktop Table View -->
+            <div class="cart-desktop-view table-responsive" style="margin-top: 0; box-shadow: var(--shadow-sm);">
                 <table>
                     <thead>
                         <tr>
@@ -74,12 +75,63 @@
                 </table>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+            <!-- Mobile Card View (Zero Horizontal Scroll on Mobile) -->
+            <div class="cart-mobile-view">
+                {% for item in items %}
+                    <div class="cart-mobile-card">
+                        <div class="cart-mobile-main">
+                            <div class="cart-mobile-img">
+                                {% if item.image_url %}
+                                    <img src="{{ url_for('uploaded_file', filename=item.image_url) }}" alt="{{ item.product_name }}">
+                                {% else %}
+                                    <span style="font-size: 10px; color: #94a3b8;">No Image</span>
+                                {% endif %}
+                            </div>
+                            <div class="cart-mobile-details">
+                                <a href="{{ url_for('product_detail', product_id=item.product_id) }}" class="cart-mobile-title">
+                                    {{ item.product_name }}
+                                </a>
+                                <div class="cart-mobile-stock">● In Stock &bull; Ready to ship</div>
+                                <div class="cart-mobile-unit-price">
+                                    ₹{{ "%.2f"|format(item.price) }} <span style="font-size: 11px; font-weight: 500; color: #64748b;">each</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-mobile-actions-row">
+                            <form action="{{ url_for('cart_update') }}" method="POST" style="margin: 0;">
+                                <input type="hidden" name="cart_item_id" value="{{ item.cart_item_id }}">
+                                <div class="qty-stepper">
+                                    <button type="submit" name="action" value="decrease" title="Decrease">&minus;</button>
+                                    <span>{{ item.quantity }}</span>
+                                    <button type="submit" name="action" value="increase" title="Increase">+</button>
+                                </div>
+                            </form>
+
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="cart-mobile-subtotal">
+                                    <span>Subtotal:</span>₹{{ "%.2f"|format(item.subtotal) }}
+                                </div>
+                                <form action="{{ url_for('cart_remove', cart_item_id=item.cart_item_id) }}" method="POST" style="margin: 0;">
+                                    <button type="submit" class="cart-mobile-delete-btn" title="Remove Item">
+                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="cart-action-buttons-row">
                 <a href="{{ url_for('index') }}" class="btn btn-secondary">
                     &larr; Continue Shopping
                 </a>
                 <form action="{{ url_for('cart_clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to empty your entire shopping cart?');" style="margin: 0;">
-                    <button type="submit" class="btn btn-danger" style="font-size: 13px;">
+                    <button type="submit" class="btn btn-danger" style="font-size: 13px; width: 100%;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         <span>Empty Cart</span>
                     </button>

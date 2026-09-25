@@ -4,16 +4,16 @@
 
 {% block content %}
 <!-- Breadcrumb Navigation -->
-<div class="account-nav-bar" style="margin-bottom: 24px;">
-    <a href="{{ url_for('index') }}">
+<nav class="breadcrumb-trail" aria-label="Breadcrumb">
+    <a href="{{ url_for('index') }}" class="crumb-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-        Home
+        <span>Home</span>
     </a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('index', category=product.category_id) }}">{{ product.category_name }}</a>
-    <span style="color: #cbd5e1;">/</span>
-    <span class="active">{{ product.product_name }}</span>
-</div>
+    <span class="crumb-sep">/</span>
+    <a href="{{ url_for('index', category=product.category_id) }}" class="crumb-link">{{ product.category_name }}</a>
+    <span class="crumb-sep">/</span>
+    <span class="crumb-current" title="{{ product.product_name }}">{{ product.product_name }}</span>
+</nav>
 
 <!-- Product Details Layout -->
 <div class="product-detail-layout">
@@ -37,18 +37,18 @@
     </div>
 
     <!-- Right: Product Information & Purchase CTAs -->
-    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="display: flex; flex-direction: column; justify-content: space-between; min-width: 0;">
         <div>
             <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: #eff6ff; border: 1px solid #bfdbfe; font-size: 11px; font-weight: 700; color: #1d4ed8; text-transform: uppercase; margin-bottom: 12px;">
                 <span>{{ product.category_name }}</span>
             </div>
 
-            <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 12px; line-height: 1.3;">
+            <h1 class="product-detail-title">
                 {{ product.product_name }}
             </h1>
 
-            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px;">
-                <span style="font-size: 32px; font-weight: 800; color: #0f172a; letter-spacing: -0.03em;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                <span class="product-detail-price">
                     ₹{{ "%.2f"|format(product.price) }}
                 </span>
                 <span style="font-size: 13px; color: #64748b; font-weight: 500;">
@@ -85,8 +85,8 @@
         <div>
             {% if product.stock_quantity > 0 %}
                 <form action="{{ url_for('cart_add', product_id=product.product_id) }}" method="POST" onsubmit="return addToCartAjax(event, this, {{ product.product_id }});">
-                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="product-purchase-row">
+                        <div class="product-qty-wrap">
                             <label style="font-size: 13px; font-weight: 700; color: #334155;">Quantity:</label>
                             <input 
                                 type="number" 
@@ -94,11 +94,11 @@
                                 value="1" 
                                 min="1" 
                                 max="{{ product.stock_quantity }}" 
-                                style="width: 74px; height: 44px; text-align: center; font-weight: 700; border-radius: 10px;"
+                                class="product-qty-input"
                             >
                         </div>
 
-                        <button type="submit" class="btn btn-primary" style="height: 46px; padding: 0 28px; font-size: 14.5px; flex: 1; min-width: 180px;">
+                        <button type="submit" class="btn btn-primary btn-product-buy">
                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <circle cx="9" cy="21" r="1"></circle>
                                 <circle cx="20" cy="21" r="1"></circle>

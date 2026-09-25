@@ -19,7 +19,7 @@
     <p style="color: #64748b; font-size: 14px; margin: 0;">Confirm recipient shipping address and choose your preferred encrypted payment method</p>
 </div>
 
-<div class="checkout-layout" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: start;">
+<div class="checkout-layout">
     <!-- Shipping Address Form Column -->
     <div class="checkout-address-col card" style="padding: 28px;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
@@ -51,7 +51,7 @@
                 <input type="text" name="address_line" id="address_line" class="form-control" value="{{ default_address.address_line if default_address and default_address.address_line else '123 Main Street, Sector 4' }}" placeholder="House / Flat no, Street name, Area" required>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 24px;">
+            <div class="checkout-grid-3col">
                 <div>
                     <label class="form-label" style="font-weight: 600; font-size: 13px; color: var(--slate-700); margin-bottom: 6px; display: block;">City *</label>
                     <input type="text" name="city" id="city" class="form-control" value="{{ default_address.city if default_address and default_address.city else 'New Delhi' }}" placeholder="City" required>
@@ -75,14 +75,14 @@
             <p style="color: var(--slate-500); font-size: 13.5px; margin-bottom: 16px;">Select your preferred instant settlement gateway.</p>
             
             <!-- Payment Mode Option Tabs -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <button type="button" class="pay-mode-btn" id="btn-mode-razorpay" onclick="selectPayMode('razorpay')" style="padding: 12px 14px; border-radius: 10px; border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
-                    <span>💳</span> Razorpay (Auto &bull; No UTR)
+            <div class="checkout-payment-modes">
+                <button type="button" class="pay-mode-btn" id="btn-mode-razorpay" onclick="selectPayMode('razorpay')">
+                    <span>💳</span> Razorpay (Auto &bull; Cards / NetBanking)
                 </button>
-                <button type="button" class="pay-mode-btn" id="btn-mode-upi" onclick="selectPayMode('upi')" style="padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700); font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+                <button type="button" class="pay-mode-btn" id="btn-mode-upi" onclick="selectPayMode('upi')">
                     <span>⚡</span> Manual UPI QR
                 </button>
-                <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')" style="padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700); font-weight: 700; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+                <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')">
                     <span>💵</span> Cash on Delivery
                 </button>
             </div>
