@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Main CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=8.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=9.0">
 </head>
 <body>
 
@@ -240,7 +240,8 @@
     <!-- Professional E-Commerce Footer -->
     <footer class="site-footer">
         <div class="footer-top">
-            <div>
+            <!-- Brand & Trust Summary -->
+            <div class="footer-brand-col">
                 <div class="footer-brand-title">
                     <span class="brand-icon-pill" style="width: 28px; height: 28px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -254,55 +255,72 @@
                 <p class="footer-desc">
                     Modern e-commerce demo project engineered for fast shopping, real-time inventory synchronization, and verified checkout.
                 </p>
-                <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
-                    <span class="badge badge-success" style="font-size: 11px;">🔒 256-Bit SSL Secured</span>
-                    <span class="badge badge-info" style="font-size: 11px;">⚡ Instant AJAX Cart</span>
+                <div class="footer-trust-badges">
+                    <span class="badge-trust ssl">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>256-Bit SSL Secured</span>
+                    </span>
+                    <span class="badge-trust ajax">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Instant AJAX Cart</span>
+                    </span>
                 </div>
             </div>
 
-            <div>
-                <h4 class="footer-heading">Catalog</h4>
-                <ul class="footer-links">
-                    <li><a href="{{ url_for('index') }}">All Categories</a></li>
-                    <li><a href="{{ url_for('index') }}">Featured Deals</a></li>
-                    <li><a href="{{ url_for('cart_view') }}">Shopping Cart</a></li>
-                    <li><a href="{{ url_for('customer_orders') }}">Track Shipments</a></li>
-                </ul>
+            <!-- Quick Navigation (2-Column Grid on Mobile) -->
+            <div class="footer-nav-cols">
+                <div class="footer-col">
+                    <h4 class="footer-heading">Catalog</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> All Categories</a></li>
+                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> Featured Deals</a></li>
+                        <li><a href="{{ url_for('cart_view') }}"><span class="footer-arrow">&rsaquo;</span> Shopping Cart</a></li>
+                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Track Shipments</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 class="footer-heading">Customer Hub</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('dashboard') }}"><span class="footer-arrow">&rsaquo;</span> My Dashboard</a></li>
+                        <li><a href="{{ url_for('profile') }}"><span class="footer-arrow">&rsaquo;</span> Profile &amp; Security</a></li>
+                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Tax Invoices</a></li>
+                        <li><a href="{{ url_for('admin_login') }}"><span class="footer-arrow">&rsaquo;</span> Merchant Access</a></li>
+                    </ul>
+                </div>
             </div>
 
-            <div>
-                <h4 class="footer-heading">Customer Hub</h4>
-                <ul class="footer-links">
-                    <li><a href="{{ url_for('dashboard') }}">My Dashboard</a></li>
-                    <li><a href="{{ url_for('profile') }}">Profile &amp; Security</a></li>
-                    <li><a href="{{ url_for('customer_orders') }}">Tax Invoices</a></li>
-                    <li><a href="{{ url_for('admin_login') }}">Merchant Access</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="footer-heading">Payment Security</h4>
-                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">
-                    All transactions are encrypted with bank-level protocol and backed by Razorpay &amp; Unified Payments Interface (UPI).
-                </p>
-                <div class="payment-badges-row">
-                    <span class="pay-badge">UPI</span>
-                    <span class="pay-badge">Razorpay</span>
-                    <span class="pay-badge">Visa</span>
-                    <span class="pay-badge">Mastercard</span>
-                    <span class="pay-badge">COD</span>
+            <!-- Payment Security Card -->
+            <div class="footer-security-col">
+                <div class="footer-security-card">
+                    <div class="security-card-header">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <h4 class="footer-heading" style="margin: 0;">Payment Security</h4>
+                    </div>
+                    <p class="footer-security-text">
+                        Bank-grade encryption backed by Razorpay &amp; Unified Payments Interface (UPI).
+                    </p>
+                    <div class="payment-badges-row">
+                        <span class="pay-badge upi">UPI</span>
+                        <span class="pay-badge rzp">Razorpay</span>
+                        <span class="pay-badge card">Visa</span>
+                        <span class="pay-badge card">Mastercard</span>
+                        <span class="pay-badge cod">COD</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <div>
+            <div class="footer-copy">
                 &copy; 2026 <b>E-Commerce Demo Project</b>. All rights reserved.
             </div>
-            <div style="display: flex; gap: 16px;">
-                <a href="{{ url_for('index') }}" style="color: #94a3b8;">Home</a>
-                <a href="{{ url_for('cart_view') }}" style="color: #94a3b8;">Cart</a>
-                <a href="{{ url_for('admin_login') }}" style="color: #94a3b8;">Admin</a>
+            <div class="footer-bottom-links">
+                <a href="{{ url_for('index') }}" class="footer-chip-link">Home</a>
+                <a href="{{ url_for('cart_view') }}" class="footer-chip-link">Cart</a>
+                <a href="{{ url_for('admin_login') }}" class="footer-chip-link admin">Admin Portal</a>
             </div>
         </div>
     </footer>
