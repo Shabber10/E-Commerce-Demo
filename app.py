@@ -7,7 +7,14 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify, make_response
 from werkzeug.utils import secure_filename
-import mysql.connector
+try:
+    import mysql.connector
+    from mysql.connector import Error as MySQLError
+except ImportError:
+    mysql = None
+    class MySQLError(Exception):
+        pass
+
 import bcrypt
 import razorpay
 from config import Config, db_connection, init_db
@@ -26,6 +33,33 @@ def add_no_cache_headers(response):
 
 # Ensure database and tables exist at startup
 init_db()
+
+
+# -------------------------------------------------------------
+# HEALTH CHECK ROUTE (for Render / uptime monitoring)
+# -------------------------------------------------------------
+@app.route('/health')
+@app.route('/healthz')
+def health_check():
+    """Health check endpoint for Render zero-downtime deploy & uptime monitors."""
+    db_ok = False
+    try:
+        conn = db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1")
+            cursor.close()
+            conn.close()
+            db_ok = True
+    except Exception as e:
+        print(f"Health check DB warning: {e}")
+
+    return jsonify({
+        "status": "healthy" if db_ok else "degraded",
+        "database": "connected" if db_ok else "unreachable",
+        "engine": Config.DB_ENGINE,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }), (200 if db_ok else 503)
 
 
 def allowed_file(filename):
@@ -189,7 +223,7 @@ def index():
             products = cursor.fetchall()
             cursor.close()
             conn.close()
-        except mysql.connector.Error as err:
+        except (MySQLError, Exception) as err:
             print(f"Database fetch error on index: {err}")
             if conn:
                 conn.close()
@@ -302,7 +336,7 @@ def login():
             flash('Invalid email or password. Please try again.', 'danger')
             return render_template('login/login.html', email=email)
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"An error occurred during login: {err}", 'danger')
         return render_template('login/login.html', email=email)
 
@@ -566,7 +600,7 @@ def register():
         flash('Account created successfully! Please sign in with your credentials.', 'success')
         return redirect(url_for('login'))
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"Database error during registration: {err}", 'danger')
         return render_template('login/register.html', full_name=full_name, email=email)
 
@@ -652,7 +686,7 @@ def forgot_password():
         flash(f"A 6-digit verification code has been sent to {email}.", 'success')
         return redirect(url_for('verify_otp'))
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"Database error: {err}", 'danger')
         return render_template('login/forgotpassword.html', email=email)
 
@@ -701,7 +735,7 @@ def verify_otp():
         flash('OTP verified successfully! Please enter your new password.', 'success')
         return redirect(url_for('updatepassword'))
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"Database error: {err}", 'danger')
         return render_template('login/verify_otp.html', masked_email=mask_email(email))
 
@@ -740,7 +774,7 @@ def resend_otp():
             flash("A new 6-digit verification code has been sent to your email.", 'info')
 
         return redirect(url_for('verify_otp'))
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"Database error: {err}", 'danger')
         return redirect(url_for('verify_otp'))
 
@@ -796,7 +830,7 @@ def updatepassword():
         else:
             flash('Your password has been reset successfully! Please sign in with your new password.', 'success')
             return redirect(url_for('login'))
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f"Database error: {err}", 'danger')
         return render_template('login/updatepassword.html')
 
@@ -833,7 +867,7 @@ def dashboard():
 
             cursor.close()
             conn.close()
-        except mysql.connector.Error as err:
+        except (MySQLError, Exception) as err:
             print(f"Error loading dashboard: {err}")
             if conn:
                 conn.close()
@@ -1073,7 +1107,7 @@ def admin_product_add():
         flash(f'Product "{product_name}" uploaded and added successfully!', 'success')
         return redirect(url_for('admin_products'))
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f'Error adding product: {err}', 'danger')
         cursor.execute("SELECT * FROM categories ORDER BY category_name")
         categories = cursor.fetchall()
@@ -1160,7 +1194,7 @@ def admin_product_edit(product_id):
         flash('Product updated successfully!', 'success')
         return redirect(url_for('admin_products'))
 
-    except mysql.connector.Error as err:
+    except (MySQLError, Exception) as err:
         flash(f'Error updating product: {err}', 'danger')
         cursor.close()
         conn.close()
@@ -1205,7 +1239,7 @@ def admin_categories():
                 cursor.execute("INSERT INTO categories (category_name) VALUES (%s)", (category_name,))
                 conn.commit()
                 flash(f'Category "{category_name}" added successfully!', 'success')
-            except mysql.connector.Error as err:
+            except (MySQLError, Exception) as err:
                 flash(f'Error adding category: {err}', 'danger')
 
     cursor.execute("""
@@ -2359,4 +2393,6 @@ def user_order_success_alias(order_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)

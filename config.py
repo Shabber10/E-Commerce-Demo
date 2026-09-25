@@ -11,7 +11,7 @@ except ImportError:
     mysql = None
     MySQLError = Exception
 
-# Auto-load .env file if present in workspace root
+# Auto-load .env file if present in workspace root (without overwriting platform env vars)
 _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
 if os.path.exists(_env_path):
     try:
@@ -20,7 +20,9 @@ if os.path.exists(_env_path):
                 _line = _raw_line.strip()
                 if _line and not _line.startswith('#') and '=' in _line:
                     _k, _v = _line.split('=', 1)
-                    os.environ[_k.strip()] = _v.strip().strip("'\"")
+                    _k_clean = _k.strip()
+                    if _k_clean not in os.environ:
+                        os.environ[_k_clean] = _v.strip().strip("'\"")
     except Exception as _env_err:
         print(f"Notice: Could not load .env file: {_env_err}")
 
@@ -28,9 +30,9 @@ if os.path.exists(_env_path):
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'super-secret-key-change-in-production-ecommerce-2026')
 
-    # Database Engine Selection: 'sqlite' (default, portable, Netlify/Render friendly) or 'mysql'
+    # Database Engine Selection: 'sqlite' (default, portable, Render friendly) or 'mysql'
     DB_ENGINE = os.environ.get('DB_ENGINE', 'sqlite').lower()
-    SQLITE_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'smartcart.db')
+    SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'smartcart.db'))
 
     # MySQL Configuration (fallback / optional)
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
@@ -39,7 +41,7 @@ class Config:
     DB_NAME = os.environ.get('DB_NAME', 'e_commerce')
 
     # Uploads Configuration
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads'))
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
     # Razorpay Configuration (Get your live/test key from https://dashboard.razorpay.com/app/keys)
@@ -56,6 +58,27 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'shabber12396@gmail.com')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'wkwzifnnfzfjxrdp')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'shabber12396@gmail.com')
+
+
+# Ensure upload directory and SQLite database directory exist
+try:
+    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(Config.SQLITE_DB_PATH)), exist_ok=True)
+
+    # Seed images if custom UPLOAD_FOLDER is configured (e.g. Render persistent disk)
+    _seed_uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+    if os.path.abspath(_seed_uploads_dir) != os.path.abspath(Config.UPLOAD_FOLDER) and os.path.exists(_seed_uploads_dir):
+        import shutil
+        for _f in os.listdir(_seed_uploads_dir):
+            _src = os.path.join(_seed_uploads_dir, _f)
+            _dst = os.path.join(Config.UPLOAD_FOLDER, _f)
+            if os.path.isfile(_src) and not os.path.exists(_dst):
+                try:
+                    shutil.copy2(_src, _dst)
+                except Exception:
+                    pass
+except Exception as _dir_err:
+    print(f"Notice: Directory initialization error: {_dir_err}")
 
 
 # =============================================================

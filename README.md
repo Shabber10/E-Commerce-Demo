@@ -107,3 +107,17 @@ E-Commerce-Demo/
 └── utils/
     └── pdf_generator.py    # HTML to PDF conversion utility (xhtml2pdf)
 ```
+
+---
+
+## 🌐 Deploy to Render
+
+This project is pre-configured for instant zero-config deployment on **Render**:
+
+1. Push your repository to **GitHub**.
+2. Go to [Render Dashboard](https://dashboard.render.com/) -> **New +** -> **Blueprint**.
+3. Select your repository — Render will automatically read `render.yaml` and configure everything.
+4. Click **Apply**.
+
+For complete manual setup instructions, environment variables list, and persistent storage options, see [RENDER_DEPLOYMENT.md](file:///c:/Users/SHABBER%20HUSSAIN/Desktop/E%20Commerce%20website/RENDER_DEPLOYMENT.md).
+

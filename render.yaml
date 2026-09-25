@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: smartcart-ecommerce
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_ENGINE
+        value: sqlite
+      - key: FLASK_DEBUG
+        value: "false"
+      - key: STORE_UPI_ID
+        value: 9704039617@fam
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: PYTHON_MAX_THREADS
+        value: "2"
