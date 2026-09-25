@@ -30,7 +30,8 @@
 </div>
 
 {% if orders %}
-    <div class="table-responsive" style="margin-top: 0;">
+    <!-- Desktop Orders Table -->
+    <div class="orders-desktop-view table-responsive" style="margin-top: 0;">
         <table>
             <thead>
                 <tr>
@@ -101,6 +102,77 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+
+    <!-- Mobile Orders Card View (Zero Horizontal Scroll on Mobile) -->
+    <div class="orders-mobile-view">
+        {% for ord in orders %}
+            <div class="order-mobile-card">
+                <div class="order-mobile-card-header">
+                    <div>
+                        <span style="font-family: monospace; font-size: 13.5px; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            #{{ ord.order_number }}
+                        </span>
+                    </div>
+                    <div style="color: #64748b; font-size: 12px;">
+                        {{ ord.order_date.strftime('%d %b %Y') if ord.order_date else '' }}
+                    </div>
+                </div>
+
+                <div class="order-mobile-card-row">
+                    <span style="color: #64748b; font-size: 13px;">Total Paid:</span>
+                    <span style="font-weight: 800; color: #0f172a; font-size: 16px;">₹{{ "%.2f"|format(ord.total_amount) }}</span>
+                </div>
+
+                <div class="order-mobile-card-row">
+                    <span style="color: #64748b; font-size: 13px;">Status:</span>
+                    <div>
+                        {% if ord.order_status == 'delivered' %}
+                            <span class="badge badge-success">
+                                <span style="width: 5px; height: 5px; border-radius: 50%; background: #10b981;"></span>
+                                Delivered
+                            </span>
+                        {% elif ord.order_status == 'shipped' %}
+                            <span class="badge badge-info">
+                                <span style="width: 5px; height: 5px; border-radius: 50%; background: #2563eb;"></span>
+                                Shipped
+                            </span>
+                        {% elif ord.order_status == 'processing' %}
+                            <span class="badge badge-warning">
+                                <span style="width: 5px; height: 5px; border-radius: 50%; background: #f59e0b;"></span>
+                                Processing
+                            </span>
+                        {% else %}
+                            <span class="badge badge-neutral">
+                                {{ ord.order_status|capitalize }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="order-mobile-card-row">
+                    <span style="color: #64748b; font-size: 13px;">Payment:</span>
+                    <div>
+                        {% if ord.payment_status == 'completed' %}
+                            <span class="badge badge-success">Paid</span>
+                        {% else %}
+                            <span class="badge badge-warning">{{ ord.payment_status|capitalize or 'Pending' }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--slate-100);">
+                    <a href="{{ url_for('download_invoice', order_id=ord.order_id) }}" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px; width: 100%;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Download PDF</span>
+                    </a>
+                    <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank" class="btn btn-secondary" style="padding: 8px 12px; font-size: 13px; width: 100%;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print</span>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 {% else %}
     <div style="border: 1px solid var(--slate-200); padding: 56px 24px; background-color: #ffffff; text-align: center; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); max-width: 520px; margin: 30px auto;">

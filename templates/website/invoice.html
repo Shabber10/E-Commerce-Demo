@@ -232,6 +232,57 @@
             font-size: 12px;
         }
 
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 16px 12px;
+            }
+            .invoice-card {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+            .header-grid {
+                flex-direction: column;
+                gap: 16px;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            .invoice-title {
+                text-align: left;
+            }
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+            .items-table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-bottom: 20px;
+            }
+            table.items-table {
+                min-width: 520px;
+                margin-bottom: 0;
+            }
+            .summary-card {
+                width: 100%;
+            }
+            .action-bar {
+                flex-wrap: wrap;
+                justify-content: stretch;
+            }
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .footer-notes {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
         @media print {
             body {
                 background: #fff;
@@ -319,30 +370,32 @@
         </div>
 
         <!-- Items Table -->
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px; text-align: center;">#</th>
-                    <th>Product &amp; Specification</th>
-                    <th style="width: 100px; text-align: right;">Unit Price</th>
-                    <th style="width: 70px; text-align: center;">Qty</th>
-                    <th style="width: 120px; text-align: right;">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
+        <div class="items-table-wrapper">
+            <table class="items-table">
+                <thead>
                     <tr>
-                        <td style="text-align: center; color: var(--slate-500);">{{ loop.index }}</td>
-                        <td>
-                            <strong style="color: var(--slate-900);">{{ item.product_name }}</strong>
-                        </td>
-                        <td style="text-align: right;">₹{{ "%.2f"|format(item.price) }}</td>
-                        <td style="text-align: center;">{{ item.quantity }}</td>
-                        <td style="text-align: right; font-weight: 600; color: var(--slate-900);">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                        <th style="width: 40px; text-align: center;">#</th>
+                        <th>Product &amp; Specification</th>
+                        <th style="width: 100px; text-align: right;">Unit Price</th>
+                        <th style="width: 70px; text-align: center;">Qty</th>
+                        <th style="width: 120px; text-align: right;">Subtotal</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td style="text-align: center; color: var(--slate-500);">{{ loop.index }}</td>
+                            <td>
+                                <strong style="color: var(--slate-900);">{{ item.product_name }}</strong>
+                            </td>
+                            <td style="text-align: right;">₹{{ "%.2f"|format(item.price) }}</td>
+                            <td style="text-align: center;">{{ item.quantity }}</td>
+                            <td style="text-align: right; font-weight: 600; color: var(--slate-900);">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- Total summary -->
         <div class="total-summary-box">
