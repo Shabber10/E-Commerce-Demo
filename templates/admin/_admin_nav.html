@@ -1,0 +1,92 @@
+<!-- Admin Primary Navigation Bar -->
+<nav class="admin-nav-container" aria-label="Admin Navigation">
+    <div class="admin-nav-bar">
+        <div class="admin-nav-brand-tag">
+            <span class="admin-badge-dot"></span>
+            <span>Admin</span>
+        </div>
+
+        <div class="admin-nav-links-track">
+            <!-- 1. Admin Dashboard -->
+            <a href="{{ url_for('admin_dashboard') }}" 
+               class="admin-nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}"
+               title="Admin Dashboard">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Admin Dashboard</span>
+            </a>
+
+            <!-- 2. Manage Products -->
+            <a href="{{ url_for('admin_products') }}" 
+               class="admin-nav-link {% if request.endpoint in ['admin_products', 'admin_view_item'] %}active{% endif %}"
+               title="Manage Products">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <span>Manage Products</span>
+            </a>
+
+            <!-- 3. + Add Product -->
+            <a href="{{ url_for('admin_product_add') }}" 
+               class="admin-nav-link {% if request.endpoint in ['admin_product_add', 'admin_product_edit'] %}active{% endif %}"
+               title="Add Product">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Product</span>
+            </a>
+
+            <!-- 4. Categories -->
+            <a href="{{ url_for('admin_categories') }}" 
+               class="admin-nav-link {% if request.endpoint == 'admin_categories' %}active{% endif %}"
+               title="Categories">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                <span>Categories</span>
+            </a>
+
+            <!-- 5. Customer Orders -->
+            <a href="{{ url_for('admin_orders') }}" 
+               class="admin-nav-link {% if request.endpoint == 'admin_orders' %}active{% endif %}"
+               title="Customer Orders">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <span>Customer Orders</span>
+            </a>
+
+            <!-- 6. Admin Profile -->
+            <a href="{{ url_for('admin_profile') }}" 
+               class="admin-nav-link {% if request.endpoint == 'admin_profile' %}active{% endif %}"
+               title="Admin Profile">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Admin Profile</span>
+            </a>
+        </div>
+
+        <div class="admin-nav-storefront-wrapper">
+            <a href="{{ url_for('index') }}" class="admin-nav-storefront-link" title="Open Storefront">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Live Store</span>
+            </a>
+        </div>
+    </div>
+</nav>

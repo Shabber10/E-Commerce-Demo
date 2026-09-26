@@ -3,24 +3,6 @@
 {% block title %}Admin Command Center - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<!-- Admin Navigation Toolbar -->
-<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
-    <span class="active">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        Admin Dashboard
-    </span>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_products') }}">Manage Products</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_product_add') }}">+ Add Product</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_categories') }}">Categories</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_orders') }}">Customer Orders</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_profile') }}">Admin Profile</a>
-</div>
-
 <!-- Admin Hero Header -->
 <div class="account-banner" style="border-top: 4px solid var(--admin);">
     <div>

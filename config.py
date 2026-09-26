@@ -45,8 +45,9 @@ class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
     # Razorpay Configuration (Get your live/test key from https://dashboard.razorpay.com/app/keys)
-    RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_eCommerceKey')
-    RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'eCommerceSecretKey')
+    RAZORPAY_MID = os.environ.get('RAZORPAY_MID', 'Tfw8efs0GjjqBQ')
+    RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_TgJilFyDTJEMzP')
+    RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'eaZjzBw6hEyEckgKRLde6tKP')
 
     # Store UPI ID for Direct UPI Payments
     STORE_UPI_ID = os.environ.get('STORE_UPI_ID', '9704039617@fam')

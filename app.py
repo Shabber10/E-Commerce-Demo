@@ -946,6 +946,7 @@ def profile():
 # ADMIN MANAGEMENT ROUTES
 # -------------------------------------------------------------
 @app.route('/admin')
+@app.route('/admin/dashboard')
 @role_required(['admin'])
 def admin_dashboard():
     """Admin dashboard with overview counts."""
@@ -1904,26 +1905,11 @@ def payment_process():
     final_txn_id = None
     final_method_name = payment_method
 
-    if 'UPI' in payment_method:
-        # Genuine UPI Payment Verification:
-        # Requires authentic 12-digit Bank Reference Number (UTR) from PhonePe / Google Pay / Paytm receipt
-        def is_valid_utr(val: str) -> bool:
-            if not val or not re.match(r'^\d{12}$', val):
-                return False
-            # Reject repetitive dummy numbers like 000000000000, 111111111111, 121212121212
-            if len(set(val)) <= 2:
-                return False
-            # Reject sequential numbers like 123456789012, 987654321098
-            if val in "01234567890123456789" or val in "98765432109876543210":
-                return False
-            return True
-
-        if not is_valid_utr(upi_utr):
-            flash('Payment Required: Please complete the payment and enter the authentic 12-digit UPI UTR reference number from your bank receipt to place your order.', 'danger')
-            return redirect(url_for('checkout'))
-        
-        final_txn_id = f"UPI-UTR-{upi_utr}"
-        final_method_name = f"UPI ({Config.STORE_UPI_ID})"
+    if 'UPI' in payment_method or 'QR' in payment_method:
+        # UPI QR Code Payment
+        txn_suffix = upi_utr if (upi_utr and len(upi_utr) >= 6) else uuid.uuid4().hex[:10].upper()
+        final_txn_id = f"UPI-QR-{txn_suffix}"
+        final_method_name = f"UPI QR Code ({Config.STORE_UPI_ID})"
         payment_status = 'completed'
 
     elif 'Cash on Delivery' in payment_method or payment_method == 'COD':
@@ -2394,5 +2380,5 @@ def user_order_success_alias(order_id):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
