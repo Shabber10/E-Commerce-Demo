@@ -175,7 +175,7 @@ INSERT OR IGNORE INTO inventory (product_id, quantity) VALUES
 
 -- Default Admin Account (Password: Admin@123)
 INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status) VALUES
-(1, 'Shabber', 'Hussain', 'shabber10343@gmail.com', '$2b$12$5Zdk7e60xxuD30D/UlXjXOYgWMqHW/obWcRV7TeMbSYb855OuIuBm', 'admin', '9876543210', 'active');
+(1, 'System', 'Admin', 'admin@smartcart.com', '$2b$12$5Zdk7e60xxuD30D/UlXjXOYgWMqHW/obWcRV7TeMbSYb855OuIuBm', 'admin', '9876543210', 'active');
 
 -- Default Demo Customer Account (Password: User@123)
 INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status) VALUES
