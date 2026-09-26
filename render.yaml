@@ -16,7 +16,7 @@ services:
       - key: FLASK_DEBUG
         value: "false"
       - key: STORE_UPI_ID
-        value: 9704039617@fam
+        value: store@upi
       - key: WEB_CONCURRENCY
         value: "2"
       - key: PYTHON_MAX_THREADS

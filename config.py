@@ -37,7 +37,7 @@ class Config:
     # MySQL Configuration (fallback / optional)
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
     DB_USER = os.environ.get('DB_USER', 'root')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'shabber')
+    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'root')
     DB_NAME = os.environ.get('DB_NAME', 'e_commerce')
 
     # Uploads Configuration
@@ -50,15 +50,15 @@ class Config:
     RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'eaZjzBw6hEyEckgKRLde6tKP')
 
     # Store UPI ID for Direct UPI Payments
-    STORE_UPI_ID = os.environ.get('STORE_UPI_ID', '9704039617@fam')
+    STORE_UPI_ID = os.environ.get('STORE_UPI_ID', 'store@upi')
 
     # Email / SMTP Configuration (Gmail OTP)
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'shabber12396@gmail.com')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'wkwzifnnfzfjxrdp')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'shabber12396@gmail.com')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', '')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', '')
 
 
 # Ensure upload directory and SQLite database directory exist
@@ -227,17 +227,20 @@ def init_db():
                     conn.executescript(f.read())
 
             # Ensure default admin and demo user accounts have valid, tested bcrypt credentials
-            # Admin: shabber10343@gmail.com / Admin@123
+            # Admin: admin@smartcart.com / Admin@123
             # Customer: customer@example.com / User@123
             admin_hash = '$2b$12$5Zdk7e60xxuD30D/UlXjXOYgWMqHW/obWcRV7TeMbSYb855OuIuBm'
             user_hash = '$2b$12$YRsjEuoqnDpWwno.JcYL4.x.c0e4w4eGCEkg2SR0ipmFApM3B8IwK'
             cur = conn.cursor()
             cur.execute("""
                 UPDATE customers 
-                SET password_hash = ?
-                WHERE LOWER(e_mail) = 'shabber10343@gmail.com'
-                  AND (password_hash LIKE '$2b$12$041oYgUq%' OR password_hash != ?)
-            """, (admin_hash, admin_hash))
+                SET first_name = 'System', last_name = 'Admin', e_mail = 'admin@smartcart.com', password_hash = ?
+                WHERE customer_id = 1 OR LOWER(e_mail) = 'shabber10343@gmail.com'
+            """, (admin_hash,))
+            cur.execute("""
+                INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status)
+                VALUES (1, 'System', 'Admin', 'admin@smartcart.com', ?, 'admin', '9876543210', 'active')
+            """, (admin_hash,))
             cur.execute("""
                 INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status)
                 VALUES (2, 'Demo', 'Customer', 'customer@example.com', ?, 'user', '9876543211', 'active')

@@ -76,7 +76,7 @@ If you prefer to configure the Web Service manually:
 
 ### 👑 Administrator Account
 Once deployed, you can access the admin dashboard at `/admin/login` (or `/login`):
-- **Email**: `shabber10343@gmail.com`
+- **Email**: `admin@smartcart.com`
 - **Password**: `Admin@123`
 
 *(You can update your admin email and password anytime from the Admin Profile page)*.
@@ -98,7 +98,7 @@ To test shopping, cart, checkout, and order history:
 | `DB_ENGINE` | `sqlite` | `sqlite` (portable, recommended for Render) or `mysql` |
 | `SQLITE_DB_PATH` | `./smartcart.db` | Custom path to SQLite file (useful if using Render Persistent Disk) |
 | `UPLOAD_FOLDER` | `./uploads` | Custom path to uploaded product photos |
-| `STORE_UPI_ID` | `9704039617@fam` | UPI ID for customer QR code payments |
+| `STORE_UPI_ID` | `store@upi` | UPI ID for customer QR code payments |
 | `RAZORPAY_KEY_ID` | `rzp_test_eCommerceKey` | Razorpay API key ID for online card/netbanking payments |
 | `RAZORPAY_KEY_SECRET` | `eCommerceSecretKey` | Razorpay API key secret |
 | `MAIL_SERVER` | `smtp.gmail.com` | SMTP host for OTP verification emails |
@@ -108,7 +108,7 @@ To test shopping, cart, checkout, and order history:
 | `MAIL_DEFAULT_SENDER` | `your_email@gmail.com` | "From" address for verification emails |
 | `DB_HOST` | `localhost` | MySQL host (only if `DB_ENGINE=mysql`) |
 | `DB_USER` | `root` | MySQL user (only if `DB_ENGINE=mysql`) |
-| `DB_PASSWORD` | `shabber` | MySQL password (only if `DB_ENGINE=mysql`) |
+| `DB_PASSWORD` | `root` | MySQL password (only if `DB_ENGINE=mysql`) |
 | `DB_NAME` | `e_commerce` | MySQL database name (only if `DB_ENGINE=mysql`) |
 
 ---
