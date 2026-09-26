@@ -72,13 +72,21 @@ If you prefer to configure the Web Service manually:
 
 ---
 
-## 🔑 Default Admin Account
+## 🔑 Default Accounts
 
-Once deployed, you can access the admin dashboard at `/admin/login`:
+### 👑 Administrator Account
+Once deployed, you can access the admin dashboard at `/admin/login` (or `/login`):
 - **Email**: `shabber10343@gmail.com`
 - **Password**: `Admin@123`
 
 *(You can update your admin email and password anytime from the Admin Profile page)*.
+
+### 🛍️ Demo Customer Account
+To test shopping, cart, checkout, and order history:
+- **Email**: `customer@example.com`
+- **Password**: `User@123`
+- **Login URL**: `/login`
+
 
 ---
 
