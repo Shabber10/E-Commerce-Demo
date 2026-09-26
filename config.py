@@ -225,6 +225,25 @@ def init_db():
             if os.path.exists(schema_file):
                 with open(schema_file, 'r', encoding='utf-8') as f:
                     conn.executescript(f.read())
+
+            # Ensure default admin and demo user accounts have valid, tested bcrypt credentials
+            # Admin: shabber10343@gmail.com / Admin@123
+            # Customer: customer@example.com / User@123
+            admin_hash = '$2b$12$5Zdk7e60xxuD30D/UlXjXOYgWMqHW/obWcRV7TeMbSYb855OuIuBm'
+            user_hash = '$2b$12$YRsjEuoqnDpWwno.JcYL4.x.c0e4w4eGCEkg2SR0ipmFApM3B8IwK'
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE customers 
+                SET password_hash = ?
+                WHERE LOWER(e_mail) = 'shabber10343@gmail.com'
+                  AND (password_hash LIKE '$2b$12$041oYgUq%' OR password_hash != ?)
+            """, (admin_hash, admin_hash))
+            cur.execute("""
+                INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status)
+                VALUES (2, 'Demo', 'Customer', 'customer@example.com', ?, 'user', '9876543211', 'active')
+            """, (user_hash,))
+            cur.execute("INSERT OR IGNORE INTO cart (customer_id) VALUES (1)")
+            cur.execute("INSERT OR IGNORE INTO cart (customer_id) VALUES (2)")
             conn.commit()
             conn.close()
             print(f"SQLite database initialized successfully at: {Config.SQLITE_DB_PATH}")

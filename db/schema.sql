@@ -221,5 +221,12 @@ INSERT IGNORE INTO inventory (product_id, quantity) VALUES
 
 -- Default Admin Account (Password: Admin@123)
 INSERT IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status) VALUES
-(1, 'Shabber', 'Hussain', 'shabber10343@gmail.com', '$2b$12$041oYgUq/oR3pWzYd6XkH.u9e6j72aK5eM0mJ2F7wZ1x4k7E8mR1G', 'admin', '9876543210', 'active');
+(1, 'Shabber', 'Hussain', 'shabber10343@gmail.com', '$2b$12$5Zdk7e60xxuD30D/UlXjXOYgWMqHW/obWcRV7TeMbSYb855OuIuBm', 'admin', '9876543210', 'active');
+
+-- Default Demo Customer Account (Password: User@123)
+INSERT IGNORE INTO customers (customer_id, first_name, last_name, e_mail, password_hash, role, phone_number, status) VALUES
+(2, 'Demo', 'Customer', 'customer@example.com', '$2b$12$YRsjEuoqnDpWwno.JcYL4.x.c0e4w4eGCEkg2SR0ipmFApM3B8IwK', 'user', '9876543211', 'active');
+
+INSERT IGNORE INTO cart (customer_id) VALUES (1), (2);
+
 

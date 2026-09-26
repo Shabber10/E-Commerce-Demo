@@ -303,7 +303,7 @@ def login():
         cursor.execute("""
             SELECT customer_id, first_name, last_name, e_mail, password_hash, role, status 
             FROM customers 
-            WHERE e_mail = %s
+            WHERE LOWER(e_mail) = LOWER(%s)
         """, (email,))
         user = cursor.fetchone()
         cursor.close()
@@ -317,7 +317,8 @@ def login():
             flash('Your account has been suspended. Please contact support.', 'danger')
             return render_template('login/login.html', email=email)
 
-        if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+        stored_hash = (user['password_hash'] or '').strip().encode('utf-8')
+        if stored_hash and bcrypt.checkpw(password.encode('utf-8'), stored_hash):
             full_name = f"{user['first_name']} {user['last_name']}".strip()
             session['user_id'] = user['customer_id']
             session['user_name'] = full_name
@@ -370,7 +371,7 @@ def admin_login():
         cursor.execute("""
             SELECT customer_id, first_name, last_name, e_mail, password_hash, role, status 
             FROM customers 
-            WHERE e_mail = %s
+            WHERE LOWER(e_mail) = LOWER(%s)
         """, (email,))
         user = cursor.fetchone()
         cursor.close()
@@ -384,7 +385,8 @@ def admin_login():
             flash('Admin account is suspended.', 'danger')
             return render_template('admin/admin_login.html', email=email)
 
-        if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+        stored_hash = (user['password_hash'] or '').strip().encode('utf-8')
+        if stored_hash and bcrypt.checkpw(password.encode('utf-8'), stored_hash):
             full_name = f"{user['first_name']} {user['last_name']}".strip()
             session['user_id'] = user['customer_id']
             session['user_name'] = full_name
