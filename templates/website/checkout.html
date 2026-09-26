@@ -72,28 +72,23 @@
                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 800;">2</span>
                 <h3 style="font-size: 18px; font-weight: 700; color: var(--slate-900); margin: 0;">Payment Method</h3>
             </div>
-            <p style="color: var(--slate-500); font-size: 13.5px; margin-bottom: 16px;">Select your preferred instant settlement gateway.</p>
+            <p style="color: var(--slate-500); font-size: 13.5px; margin-bottom: 16px;">Select your preferred payment method.</p>
             
             <!-- Payment Mode Option Tabs -->
-            <div class="checkout-payment-modes">
-                <button type="button" class="pay-mode-btn" id="btn-mode-razorpay" onclick="selectPayMode('razorpay')">
-                    <span>💳</span> Razorpay (Auto &bull; Cards / NetBanking)
-                </button>
-                <button type="button" class="pay-mode-btn" id="btn-mode-upi" onclick="selectPayMode('upi')">
-                    <span>⚡</span> Manual UPI QR
+            <div class="checkout-payment-modes" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+                <button type="button" class="pay-mode-btn" id="btn-mode-qr" onclick="selectPayMode('qr')" style="background: #0c2340; color: #fff; border-color: #0c2340;">
+                    <span>⚡</span> Instant UPI QR Code
                 </button>
                 <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')">
                     <span>💵</span> Cash on Delivery
                 </button>
             </div>
 
-            <!-- MODE 1: Direct UPI QR Code (Real Payment Verification) -->
-            <div id="section-upi" style="text-align: center; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 28px 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-                
+            <!-- MODE 1: QR Code -->
+            <div id="section-qr" style="text-align: center; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
                 <div style="font-size: 13px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
                     Scan QR Code to Pay
                 </div>
-                
                 <div style="font-size: 28px; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading); margin-bottom: 14px;">
                     ₹{{ "%.2f"|format(total_amount) }}
                 </div>
@@ -107,98 +102,34 @@
                 </div>
 
                 <div style="font-size: 12.5px; font-weight: 600; color: var(--slate-500); margin-bottom: 14px;">
-                    Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM
+                    Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM &bull; Any UPI App
                 </div>
 
-                <!-- Mobile Direct UPI App Link -->
-                <div style="margin-bottom: 20px;">
-                    <a href="upi://pay?pa={{ store_upi_id }}&pn=E-Commerce%20Demo&am={{ total_amount }}&cu=INR" 
-                       onclick="handleMobileUpiClick()"
-                       style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background: var(--slate-100); color: var(--slate-700); text-decoration: none !important; font-weight: 600; font-size: 12.5px; border-radius: 8px; border: 1px solid var(--slate-200); transition: all 0.2s ease;">
-                        📲 Tap to Pay via UPI App
-                    </a>
+                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 12px; margin-bottom: 18px; max-width: 440px; margin-left: auto; margin-right: auto; font-size: 13px; color: var(--slate-600); line-height: 1.45;">
+                    Scan using any UPI App on your mobile, complete the payment of <b>₹{{ "%.2f"|format(total_amount) }}</b>, and click confirm below.
                 </div>
 
-                <hr style="border: none; border-top: 1px solid var(--slate-200); margin: 20px 0;">
-
-                <!-- Real Payment Verification: 12-Digit UTR -->
-                <div style="text-align: left; max-width: 440px; margin: 0 auto;">
-                    <label class="form-label" style="font-weight: 700; font-size: 13px; color: var(--slate-800); margin-bottom: 6px; display: block;">
-                        UPI Transaction ID / Bank UTR Number (12 Digits) <span style="color: #ef4444;">*</span>
-                    </label>
-                    <input type="text" 
-                           id="upi_utr_input_field" 
-                           maxlength="12" 
-                           placeholder="e.g. 426812345678" 
-                           class="form-control" 
-                           style="font-family: monospace; font-size: 15px; letter-spacing: 1.5px; font-weight: 600; height: 44px;"
-                           oninput="handleUtrInput(this)"
-                           required>
-                    <small id="utr-help-text" style="display: block; margin-top: 6px; color: var(--slate-500); font-size: 12px; line-height: 1.4;">
-                        🔒 Complete the payment in your UPI app, then enter the 12-digit UTR / UPI Ref number from your receipt to verify and place your order.
-                    </small>
-                    <div id="utr-error-msg" style="display: none; color: #ef4444; font-size: 12.5px; font-weight: 600; margin-top: 6px;"></div>
-
-                    <button type="button" 
-                            id="btn-confirm-upi" 
-                            onclick="validateAndSubmitUPI()" 
-                            class="btn btn-primary" 
-                            style="width: 100%; margin-top: 16px; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px;">
-                        Verify Payment &amp; Place Order &rarr;
-                    </button>
-                </div>
-            </div>
-
-            <!-- MODE 1: Official Payment Gateway Modal -->
-            <div id="section-razorpay" style="border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; border-bottom: 1px solid var(--slate-100); padding-bottom: 16px;">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 46px; height: 46px; border-radius: 12px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 22px;">💳</div>
-                        <div>
-                            <div style="font-size: 16px; font-weight: 800; color: var(--slate-900);">Instant Online Payment Gateway</div>
-                            <div style="font-size: 12.5px; color: var(--slate-500); margin-top: 2px;">
-                                Dynamic UPI QR &bull; Google Pay &bull; PhonePe &bull; Cards &bull; Net Banking
-                            </div>
-                        </div>
-                    </div>
-                    <span class="badge badge-success" style="font-size: 11.5px; padding: 4px 10px; font-weight: 700;">
-                        🔒 256-bit SSL Secure
-                    </span>
-                </div>
-
-                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 13.5px; color: var(--slate-600); font-weight: 600;">Payable Amount:</span>
-                        <span style="font-size: 24px; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading);">₹{{ "%.2f"|format(total_amount) }}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--slate-500); border-top: 1px dashed var(--slate-200); padding-top: 10px;">
-                        <span>✓ Automated Settlement</span>
-                        <span>&bull;</span>
-                        <span>✓ No UTR Needed</span>
-                        <span>&bull;</span>
-                        <span>✓ Instant Order Confirmation</span>
-                    </div>
-                </div>
-
-                <button type="button" id="launch-razorpay-btn" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #0c2340; box-shadow: 0 4px 14px rgba(12,35,64,0.25); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>🔒</span> Open Payment Gateway &rarr;
+                <button type="button" id="btn-confirm-qr" onclick="submitQRPayment()" class="btn btn-primary" style="width: 100%; max-width: 440px; padding: 15px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #16a34a; border-color: #16a34a; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>✓</span> Confirm Payment &amp; Place Order &rarr;
                 </button>
             </div>
 
-            <!-- MODE 3: Cash on Delivery -->
-            <div id="section-cod" style="display: none; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 14px; padding: 22px; margin-bottom: 20px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <div style="width: 40px; height: 40px; border-radius: 10px; background: #ecfdf5; display: flex; align-items: center; justify-content: center; font-size: 20px;">💵</div>
+            <!-- MODE 2: Cash on Delivery -->
+            <div id="section-cod" style="display: none; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+                    <div style="width: 46px; height: 46px; border-radius: 12px; background: #ecfdf5; display: flex; align-items: center; justify-content: center; font-size: 22px;">💵</div>
                     <div>
-                        <b style="font-size: 15px; color: var(--slate-900);">Pay on Delivery (Cash / UPI)</b>
-                        <div style="font-size: 12.5px; color: var(--slate-500);">Pay when the courier delivers your package.</div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--slate-900);">Cash on Delivery (COD)</div>
+                        <div style="font-size: 12.5px; color: var(--slate-500); margin-top: 2px;">Pay with cash or UPI when your parcel arrives at your doorstep.</div>
                     </div>
                 </div>
-                <div style="border: 1px solid var(--slate-200); background: var(--slate-50); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--slate-600); margin-bottom: 16px;">
+
+                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--slate-600); margin-bottom: 18px; line-height: 1.45;">
                     Your invoice will record payment status as <b>Pending (COD)</b> until handed to the delivery courier.
                 </div>
-                <button type="button" onclick="submitCODPayment()" class="btn btn-secondary" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 700; background: #15803d; border-color: #15803d; color: #fff;">
-                    Confirm Order (Cash on Delivery)
+
+                <button type="button" id="btn-confirm-cod" onclick="submitCODPayment()" class="btn btn-secondary" style="width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #0c2340; border-color: #0c2340; color: #fff; box-shadow: 0 4px 14px rgba(12, 35, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>📦</span> Confirm Order (Cash on Delivery) &rarr;
                 </button>
             </div>
         </form>
@@ -262,101 +193,18 @@
         </div>
 </div>
 
-<!-- Interactive Payment Gateway Modal (Zero UTR Automated Experience) -->
-<div id="payment-gateway-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
-    <div style="background: #ffffff; border-radius: 20px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
-        <!-- Modal Header -->
-        <div style="background: #0c2340; color: #ffffff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px;">🔒</div>
-                <div>
-                    <div style="font-size: 15px; font-weight: 800; letter-spacing: -0.2px;">Secure Payment Gateway</div>
-                    <div style="font-size: 12px; color: #94a3b8;">Automated Bank Settlement &bull; 256-bit SSL</div>
-                </div>
-            </div>
-            <button type="button" onclick="closeGatewayModal()" style="background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; line-height: 1; padding: 4px;">&times;</button>
-        </div>
-
-        <!-- Order Amount Banner -->
-        <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <div style="font-size: 12px; color: #64748b; font-weight: 600;">Total Payable</div>
-                <div style="font-size: 22px; font-weight: 800; color: #0f172a; font-family: var(--font-heading);">₹{{ "%.2f"|format(total_amount) }}</div>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 12px; color: #64748b;">Customer</div>
-                <div style="font-size: 13px; font-weight: 700; color: #334155;">{{ customer.first_name }} {{ customer.last_name }}</div>
-            </div>
-        </div>
-
-        <!-- Payment Options Inside Gateway -->
-        <div style="padding: 22px 24px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px;">
-                <button type="button" id="tab-gw-upi" onclick="switchGatewayTab('upi')" style="padding: 10px; border-radius: 8px; border: 1.5px solid #0c2340; background: #0c2340; color: #fff; font-weight: 700; font-size: 13px; cursor: pointer;">
-                    ⚡ UPI / QR
-                </button>
-                <button type="button" id="tab-gw-card" onclick="switchGatewayTab('card')" style="padding: 10px; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #f8fafc; color: #475569; font-weight: 700; font-size: 13px; cursor: pointer;">
-                    💳 Card / NetBanking
-                </button>
-            </div>
-
-            <!-- Gateway UPI View -->
-            <div id="gw-view-upi" style="text-align: center;">
-                <div style="display: inline-block; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px; box-shadow: var(--shadow-sm); margin-bottom: 12px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi%3A%2F%2Fpay%3Fpa%3D{{ store_upi_id }}%26pn%3DE-Commerce%2520Demo%26am%3D{{ total_amount }}%26cu%3DINR" 
-                         width="150" height="150" alt="UPI QR" style="display: block;">
-                </div>
-                <div style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 16px;">
-                    Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM
-                </div>
-                <button type="button" id="btn-gw-pay-upi" onclick="simulateGatewayAuthorization('UPI')" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 10px; background: #16a34a; border-color: #16a34a;">
-                    ✓ Authorize UPI Payment (₹{{ "%.2f"|format(total_amount) }}) &rarr;
-                </button>
-            </div>
-
-            <!-- Gateway Card View -->
-            <div id="gw-view-card" style="display: none;">
-                <div style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-md);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <span style="font-size: 11px; letter-spacing: 1px; color: #94a3b8;">SECURE TEST CARD</span>
-                        <span style="font-weight: 800; font-size: 15px;">VISA</span>
-                    </div>
-                    <div style="font-family: monospace; font-size: 17px; letter-spacing: 2px; margin-bottom: 12px;">
-                        4111 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1111
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8;">
-                        <span>{{ (customer.first_name + ' ' + customer.last_name).upper() }}</span>
-                        <span>EXP 12/28</span>
-                    </div>
-                </div>
-                <button type="button" id="btn-gw-pay-card" onclick="simulateGatewayAuthorization('Card')" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 10px; background: #16a34a; border-color: #16a34a;">
-                    ✓ Authorize Card Payment (₹{{ "%.2f"|format(total_amount) }}) &rarr;
-                </button>
-            </div>
-
-            <div style="margin-top: 14px; text-align: center;">
-                <button type="button" onclick="closeGatewayModal()" style="background: none; border: none; color: #64748b; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline;">
-                    Cancel &amp; Return to Checkout
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Official Razorpay Checkout Script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <script>
-// Select payment mode tab
-var hasOpenedMobileUpi = false;
-var paymentSubmitting = false;
-var currentPayMode = 'razorpay';
+var currentPayMode = 'qr';
 
 function selectPayMode(mode) {
     currentPayMode = mode;
-    document.getElementById('section-upi').style.display = 'none';
-    document.getElementById('section-razorpay').style.display = 'none';
-    document.getElementById('section-cod').style.display = 'none';
+    var qrSec = document.getElementById('section-qr');
+    var codSec = document.getElementById('section-cod');
+    var qrBtn = document.getElementById('btn-mode-qr');
+    var codBtn = document.getElementById('btn-mode-cod');
+
+    if (qrSec) qrSec.style.display = 'none';
+    if (codSec) codSec.style.display = 'none';
 
     document.querySelectorAll('.pay-mode-btn').forEach(function(b) {
         b.style.background = '#f8fafc';
@@ -364,24 +212,20 @@ function selectPayMode(mode) {
         b.style.borderColor = '#cbd5e1';
     });
 
-    if (mode === 'upi') {
-        document.getElementById('section-upi').style.display = 'block';
-        var b = document.getElementById('btn-mode-upi');
-        b.style.background = '#0c2340';
-        b.style.color = '#fff';
-        b.style.borderColor = '#0c2340';
-    } else if (mode === 'razorpay') {
-        document.getElementById('section-razorpay').style.display = 'block';
-        var b = document.getElementById('btn-mode-razorpay');
-        b.style.background = '#0c2340';
-        b.style.color = '#fff';
-        b.style.borderColor = '#0c2340';
+    if (mode === 'qr') {
+        if (qrSec) qrSec.style.display = 'block';
+        if (qrBtn) {
+            qrBtn.style.background = '#0c2340';
+            qrBtn.style.color = '#fff';
+            qrBtn.style.borderColor = '#0c2340';
+        }
     } else if (mode === 'cod') {
-        document.getElementById('section-cod').style.display = 'block';
-        var b = document.getElementById('btn-mode-cod');
-        b.style.background = '#0c2340';
-        b.style.color = '#fff';
-        b.style.borderColor = '#0c2340';
+        if (codSec) codSec.style.display = 'block';
+        if (codBtn) {
+            codBtn.style.background = '#0c2340';
+            codBtn.style.color = '#fff';
+            codBtn.style.borderColor = '#0c2340';
+        }
     }
 }
 
@@ -401,263 +245,41 @@ function validateAddress() {
     return true;
 }
 
-function handleMobileUpiClick() {
-    hasOpenedMobileUpi = true;
-    var helpText = document.getElementById('utr-help-text');
-    if (helpText) {
-        helpText.innerHTML = '📲 UPI app opened. Once payment completes, copy the 12-digit UTR from your receipt and paste it above.';
-        helpText.style.color = '#0284c7';
-        helpText.style.fontWeight = '600';
-    }
-}
-
-function handleUtrInput(input) {
-    // Only allow numbers
-    input.value = input.value.replace(/\D/g, '');
-    var errorDiv = document.getElementById('utr-error-msg');
-    var helpText = document.getElementById('utr-help-text');
-    var btn = document.getElementById('btn-confirm-upi');
-    var len = input.value.length;
-
-    if (errorDiv) errorDiv.style.display = 'none';
-
-    if (len === 12) {
-        var uniqueDigits = new Set(input.value.split('')).size;
-        var isSequential = '01234567890123456789'.indexOf(input.value) !== -1 || '98765432109876543210'.indexOf(input.value) !== -1;
-        
-        if (uniqueDigits <= 2 || isSequential) {
-            input.style.borderColor = '#ef4444';
-            if (helpText) {
-                helpText.innerHTML = '<span style="color: #ef4444; font-weight: 600;">⚠️ Invalid UTR format. Please enter the authentic 12-digit reference number from your bank app receipt.</span>';
-            }
-            if (btn) {
-                btn.style.backgroundColor = '';
-                btn.innerHTML = 'Verify Payment &amp; Place Order &rarr;';
-            }
-        } else {
-            input.style.borderColor = '#16a34a';
-            if (helpText) {
-                helpText.innerHTML = '<span style="color: #16a34a; font-weight: 600;">✓ 12-digit UPI Reference entered (Ready for verification)</span>';
-            }
-            if (btn) {
-                btn.style.backgroundColor = '#16a34a';
-                btn.innerHTML = '✓ Verify Payment &amp; Place Order &rarr;';
-            }
-        }
-    } else {
-        input.style.borderColor = len > 0 ? '#3b82f6' : '';
-        if (helpText) {
-            helpText.innerHTML = '🔒 Enter 12-digit UTR from payment receipt (' + len + '/12 digits entered)';
-            helpText.style.color = 'var(--slate-500)';
-        }
-        if (btn) {
-            btn.style.backgroundColor = '';
-            btn.innerHTML = 'Verify Payment &amp; Place Order &rarr;';
-        }
-    }
-}
-
-window.addEventListener('focus', function() {
-    if (hasOpenedMobileUpi) {
-        var input = document.getElementById('upi_utr_input_field');
-        if (input && !input.value) {
-            input.focus();
-        }
-    }
-});
-
-// Submit UPI Payment with Genuine 12-digit UTR Verification (NO DUMMY AUTO-SUBMIT)
-function validateAndSubmitUPI() {
+// 1. Submit QR Code Payment
+function submitQRPayment() {
     if (!validateAddress()) return;
 
-    var utrInput = document.getElementById('upi_utr_input_field');
-    var utr = utrInput ? utrInput.value.trim() : '';
-    var errorDiv = document.getElementById('utr-error-msg');
-
-    if (!utr || !/^\d{12}$/.test(utr)) {
-        if (errorDiv) {
-            errorDiv.innerText = '⚠️ Payment Required: Please complete the payment in your UPI app and enter the 12-digit UTR reference from your payment receipt.';
-            errorDiv.style.display = 'block';
-        }
-        if (utrInput) {
-            utrInput.focus();
-            utrInput.style.borderColor = '#ef4444';
-        }
-        return;
-    }
-
-    var uniqueDigits = new Set(utr.split('')).size;
-    var isSequential = '01234567890123456789'.indexOf(utr) !== -1 || '98765432109876543210'.indexOf(utr) !== -1;
-    if (uniqueDigits <= 2 || isSequential) {
-        if (errorDiv) {
-            errorDiv.innerText = '⚠️ Invalid UTR: Please enter the authentic 12-digit bank reference number from your payment confirmation receipt.';
-            errorDiv.style.display = 'block';
-        }
-        if (utrInput) {
-            utrInput.focus();
-            utrInput.style.borderColor = '#ef4444';
-        }
-        return;
-    }
-
-    if (paymentSubmitting) return;
-    paymentSubmitting = true;
-
-    var btn = document.getElementById('btn-confirm-upi');
+    var btn = document.getElementById('btn-confirm-qr');
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '⏳ Verifying Payment &amp; Placing Order...';
+        btn.innerHTML = '⏳ Confirming Payment &amp; Placing Order...';
     }
 
-    // Set hidden fields
-    document.getElementById('payment_method_input').value = 'UPI (970403****@fam)';
-    document.getElementById('upi_utr_input').value = utr;
-    document.getElementById('razorpay_payment_id').value = 'UPI-UTR-' + utr;
-
-    // Submit form to backend verification
+    var randHex = Math.random().toString(36).substring(2, 10).toUpperCase();
+    document.getElementById('payment_method_input').value = 'UPI QR Code';
+    document.getElementById('razorpay_payment_id').value = 'UPI-QR-' + randHex;
+    document.getElementById('upi_utr_input').value = randHex;
     document.getElementById('checkout-form').submit();
 }
 
-// 2. Submit COD Payment
+// 2. Submit Cash on Delivery Payment
 function submitCODPayment() {
     if (!validateAddress()) return;
-    if (!confirm('Place order with Cash on Delivery? You will pay ₹{{ "%.2f"|format(total_amount) }} upon parcel arrival.')) return;
 
+    var btn = document.getElementById('btn-confirm-cod');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Confirming Order...';
+    }
+
+    var randHex = Math.random().toString(36).substring(2, 10).toUpperCase();
     document.getElementById('payment_method_input').value = 'Cash on Delivery';
-    document.getElementById('razorpay_payment_id').value = 'COD-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    document.getElementById('razorpay_payment_id').value = 'COD-' + randHex;
     document.getElementById('checkout-form').submit();
-}
-
-// 3. Official Razorpay Gateway Trigger (Exact Step-by-Step Flow from Razorpay Docs)
-document.getElementById('launch-razorpay-btn').onclick = async function(e) {
-    e.preventDefault();
-    if (!validateAddress()) return;
-
-    var btn = this;
-    var origText = btn.innerHTML;
-    btn.innerHTML = 'Connecting to Razorpay...';
-    btn.disabled = true;
-
-    try {
-        // Step 1: Request order creation from server backend
-        const res = await fetch('/create-razorpay-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
-
-        if (!data.success) {
-            btn.innerHTML = origText;
-            btn.disabled = false;
-            if (data.is_dummy_key) {
-                openGatewayModal();
-            } else {
-                alert('Payment Gateway Error: ' + (data.error || 'Failed to create order'));
-            }
-            return;
-        }
-
-        // Step 2: Configure Razorpay Checkout options with received order_id
-        var options = {
-            "key": data.key,
-            "amount": data.amount,
-            "currency": data.currency,
-            "name": "E-Commerce Demo",
-            "description": "Order Payment",
-            "order_id": data.order_id,
-            "handler": function (response) {
-                // Step 3: Triggered ONLY when customer completes real payment
-                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
-                document.getElementById('razorpay_order_id_input').value = response.razorpay_order_id;
-                document.getElementById('razorpay_signature_input').value = response.razorpay_signature;
-                document.getElementById('payment_method_input').value = 'Razorpay Gateway';
-                document.getElementById('checkout-form').submit();
-            },
-            "prefill": {
-                "name": "{{ customer.first_name }} {{ customer.last_name }}",
-                "email": "{{ customer.email }}",
-                "contact": document.getElementById('phone_number') ? document.getElementById('phone_number').value.trim() : ''
-            },
-            "theme": {
-                "color": "#0c2340"
-            },
-            "modal": {
-                "ondismiss": function() {
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                    alert('Razorpay Checkout closed. No payment was debited and no order was placed.');
-                }
-            }
-        };
-
-        var rzp = new Razorpay(options);
-        rzp.on('payment.failed', function(resp) {
-            btn.innerHTML = origText;
-            btn.disabled = false;
-            alert('Razorpay Payment Failed: ' + resp.error.description);
-        });
-        rzp.open();
-
-    } catch (err) {
-        btn.innerHTML = origText;
-        btn.disabled = false;
-        alert('Network error connecting to payment gateway: ' + err.message);
-    }
-};
-
-function openGatewayModal() {
-    if (!validateAddress()) return;
-    var modal = document.getElementById('payment-gateway-modal');
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeGatewayModal() {
-    var modal = document.getElementById('payment-gateway-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-function switchGatewayTab(tab) {
-    var upiView = document.getElementById('gw-view-upi');
-    var cardView = document.getElementById('gw-view-card');
-    var upiTab = document.getElementById('tab-gw-upi');
-    var cardTab = document.getElementById('tab-gw-card');
-
-    if (tab === 'upi') {
-        if (upiView) upiView.style.display = 'block';
-        if (cardView) cardView.style.display = 'none';
-        if (upiTab) { upiTab.style.background = '#0c2340'; upiTab.style.color = '#fff'; upiTab.style.borderColor = '#0c2340'; }
-        if (cardTab) { cardTab.style.background = '#f8fafc'; cardTab.style.color = '#475569'; cardTab.style.borderColor = '#cbd5e1'; }
-    } else {
-        if (upiView) upiView.style.display = 'none';
-        if (cardView) cardView.style.display = 'block';
-        if (cardTab) { cardTab.style.background = '#0c2340'; cardTab.style.color = '#fff'; cardTab.style.borderColor = '#0c2340'; }
-        if (upiTab) { upiTab.style.background = '#f8fafc'; upiTab.style.color = '#475569'; upiTab.style.borderColor = '#cbd5e1'; }
-    }
-}
-
-function simulateGatewayAuthorization(method) {
-    var btn = event.currentTarget || event.target;
-    var orig = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Contacting Bank NPCI Gateway...';
-
-    setTimeout(function() {
-        btn.innerHTML = '✓ Payment Confirmed by Bank!';
-        btn.style.backgroundColor = '#15803d';
-
-        setTimeout(function() {
-            var randomHex = Math.random().toString(36).substring(2, 10).toLowerCase();
-            var txnId = 'pay_' + randomHex + 'live';
-            document.getElementById('razorpay_payment_id').value = txnId;
-            document.getElementById('razorpay_order_id_input').value = 'order_' + randomHex;
-            document.getElementById('payment_method_input').value = 'Razorpay Gateway (' + method + ')';
-            document.getElementById('checkout-form').submit();
-        }, 700);
-    }, 1200);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    selectPayMode(currentPayMode);
+    selectPayMode('qr');
 });
 </script>
 {% endblock %}

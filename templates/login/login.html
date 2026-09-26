@@ -6,11 +6,6 @@
 <div class="auth-page">
     <div class="auth-card user-card">
         <div class="auth-header">
-            <div class="auth-badge-wrapper">
-                <span class="auth-badge user">
-                    <span class="badge-dot" style="background: #2563eb;"></span> Secure Customer Gateway
-                </span>
-            </div>
 
             <div class="auth-icon-wrap user">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -20,7 +15,7 @@
             </div>
 
             <h1 class="auth-title">Welcome Back</h1>
-            <p class="auth-subtitle">Sign in to manage your shopping cart, orders, and addresses</p>
+            
         </div>
 
         <form action="{{ url_for('login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}" method="POST">
@@ -64,6 +59,9 @@
                         required 
                         autocomplete="current-password"
                     >
+                    <button type="button" class="password-toggle-btn" title="Toggle password visibility" aria-label="Toggle password visibility">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
                 </div>
             </div>
 

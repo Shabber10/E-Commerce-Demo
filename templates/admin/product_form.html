@@ -3,18 +3,6 @@
 {% block title %}{% if is_edit %}Edit Product{% else %}Add New Product{% endif %} - Admin Portal{% endblock %}
 
 {% block content %}
-<!-- Admin Navigation Toolbar -->
-<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
-    <a href="{{ url_for('admin_dashboard') }}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        Admin Dashboard
-    </a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_products') }}">Manage Products</a>
-    <span style="color: #cbd5e1;">/</span>
-    <span class="active">{% if is_edit %}Edit Product{% else %}Add Product{% endif %}</span>
-</div>
-
 <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
     <div>
         <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">

@@ -22,7 +22,7 @@
 <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
     <div>
         <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">My Order History</h1>
-        <p style="color: #64748b; font-size: 14px; margin: 0;">Track your shipments and download official computer-generated PDF tax invoices</p>
+        
     </div>
     <a href="{{ url_for('index') }}" class="btn btn-secondary">
         &larr; Shop More Items
@@ -31,77 +31,111 @@
 
 {% if orders %}
     <!-- Desktop Orders Table -->
-    <div class="orders-desktop-view table-responsive" style="margin-top: 0;">
-        <table>
-            <thead>
-                <tr>
-                    <th width="160">Order Number</th>
-                    <th width="150">Order Date</th>
-                    <th width="120">Total Paid</th>
-                    <th width="140">Fulfillment</th>
-                    <th width="130">Payment</th>
-                    <th width="160" style="text-align: right;">Official Tax Invoice</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ord in orders %}
-                    <tr>
-                        <td>
-                            <span style="font-family: monospace; font-size: 13.5px; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                #{{ ord.order_number }}
-                            </span>
-                        </td>
-                        <td style="color: #64748b; font-size: 13px;">
-                            {{ ord.order_date.strftime('%d %b %Y, %I:%M %p') if ord.order_date else '' }}
-                        </td>
-                        <td style="font-weight: 800; color: #0f172a; font-size: 15px;">
-                            ₹{{ "%.2f"|format(ord.total_amount) }}
-                        </td>
-                        <td>
-                            {% if ord.order_status == 'delivered' %}
-                                <span class="badge badge-success">
-                                    <span style="width: 5px; height: 5px; border-radius: 50%; background: #10b981;"></span>
-                                    Delivered
-                                </span>
-                            {% elif ord.order_status == 'shipped' %}
-                                <span class="badge badge-info">
-                                    <span style="width: 5px; height: 5px; border-radius: 50%; background: #2563eb;"></span>
-                                    Shipped
-                                </span>
-                            {% elif ord.order_status == 'processing' %}
-                                <span class="badge badge-warning">
-                                    <span style="width: 5px; height: 5px; border-radius: 50%; background: #f59e0b;"></span>
-                                    Processing
-                                </span>
-                            {% else %}
-                                <span class="badge badge-neutral">
-                                    {{ ord.order_status|capitalize }}
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if ord.payment_status == 'completed' %}
-                                <span class="badge badge-success">Paid</span>
-                            {% else %}
-                                <span class="badge badge-warning">{{ ord.payment_status|capitalize or 'Pending' }}</span>
-                            {% endif %}
-                        </td>
-                        <td style="text-align: right; white-space: nowrap;">
-                            <div style="display: inline-flex; gap: 6px;">
-                                <a href="{{ url_for('download_invoice', order_id=ord.order_id) }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" title="Download Official PDF Invoice">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    <span>PDF</span>
-                                </a>
-                                <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="Print Invoice">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                                    <span>Print</span>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="orders-desktop-view">
+        <div class="orders-table-card">
+            <div class="table-responsive" style="margin: 0;">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 230px;">Order Number</th>
+                            <th style="min-width: 170px;">Order Date</th>
+                            <th style="min-width: 130px;">Total Paid</th>
+                            <th style="min-width: 150px;">Fulfillment</th>
+                            <th style="min-width: 130px;">Payment</th>
+                            <th style="min-width: 180px; text-align: right;">Official Tax Invoice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ord in orders %}
+                            <tr>
+                                <td>
+                                    <span class="order-num-pill" title="Order ID: {{ ord.order_number }}">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </svg>
+                                        <span>#{{ ord.order_number }}</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="color: #334155; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span>{{ ord.order_date.strftime('%d %b %Y, %I:%M %p') if ord.order_date else '—' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 800; color: #0f172a; font-size: 15px; letter-spacing: -0.01em;">
+                                        ₹{{ "%.2f"|format(ord.total_amount) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if ord.order_status == 'delivered' %}
+                                        <span class="badge badge-success" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                                            Delivered
+                                        </span>
+                                    {% elif ord.order_status == 'shipped' %}
+                                        <span class="badge badge-info" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb;"></span>
+                                            Shipped
+                                        </span>
+                                    {% elif ord.order_status == 'processing' %}
+                                        <span class="badge badge-warning" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;"></span>
+                                            Processing
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-neutral" style="padding: 4px 10px; border-radius: 9999px;">
+                                            {{ ord.order_status|capitalize }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ord.payment_status == 'completed' %}
+                                        <span class="badge badge-success" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 9999px;">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            Paid
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-warning" style="padding: 4px 10px; border-radius: 9999px;">
+                                            {{ ord.payment_status|capitalize or 'Pending' }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div class="order-invoice-actions">
+                                        <a href="{{ url_for('download_invoice', order_id=ord.order_id) }}" class="btn-invoice-pdf" title="Download Official Tax Invoice PDF">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="7 10 12 15 17 10"></polyline>
+                                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                                            </svg>
+                                            <span>PDF</span>
+                                        </a>
+                                        <a href="{{ url_for('order_invoice', order_id=ord.order_id) }}" target="_blank" class="btn-invoice-print" title="View & Print Official Invoice">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                                <rect x="6" y="14" width="12" height="8"></rect>
+                                            </svg>
+                                            <span>Print</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Mobile Orders Card View (Zero Horizontal Scroll on Mobile) -->

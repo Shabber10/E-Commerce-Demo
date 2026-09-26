@@ -1,96 +1,824 @@
 {% extends "base.html" %}
 
-{% block title %}Administrator Profile &amp; Settings - E-Commerce Demo{% endblock %}
+{% block title %}Admin Profile &amp; Credentials - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<!-- Admin Navigation Toolbar -->
-<div class="account-nav-bar admin-bar" style="margin-bottom: 24px;">
-    <a href="{{ url_for('admin_dashboard') }}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-        Admin Dashboard
-    </a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_products') }}">Manage Products</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_categories') }}">Categories</a>
-    <span style="color: #cbd5e1;">/</span>
-    <a href="{{ url_for('admin_orders') }}">Orders</a>
-    <span style="color: #cbd5e1;">/</span>
-    <span class="active">Admin Profile</span>
-</div>
+<style>
+/* Enterprise Admin Profile Styling */
+.admin-profile-container {
+    max-width: 1140px;
+    margin: 0 auto 40px auto;
+}
 
-<div style="margin-bottom: 24px;">
-    <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Administrator Credentials &amp; Profile</h1>
-    <p style="color: #64748b; font-size: 14px; margin: 0;">Configure manager contact info, security passwords, and executive profile photo</p>
-</div>
+.admin-header-row {
+    margin-bottom: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+}
 
-<div class="card-box" style="max-width: 680px; margin-bottom: 30px;">
-    <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid var(--slate-100); margin-bottom: 24px;">
+.admin-profile-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 26px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .admin-profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Left Column: Executive Identity Card */
+.admin-id-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    position: sticky;
+    top: 90px;
+}
+
+.admin-card-banner {
+    height: 110px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #be123c 100%);
+    position: relative;
+}
+
+.admin-card-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(244, 63, 94, 0.35), transparent 70%);
+}
+
+.admin-avatar-wrapper {
+    padding: 0 24px;
+    margin-top: -50px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.admin-avatar-box {
+    position: relative;
+    width: 94px;
+    height: 94px;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.admin-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.admin-avatar-trigger-btn {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: all 0.2s ease;
+}
+
+.admin-avatar-trigger-btn:hover {
+    background: #e11d48;
+    transform: scale(1.08);
+}
+
+.admin-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+}
+
+.admin-card-body {
+    padding: 16px 24px 24px 24px;
+}
+
+.admin-card-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 3px 0;
+    letter-spacing: -0.01em;
+}
+
+.admin-card-email {
+    font-size: 13px;
+    color: #64748b;
+    word-break: break-all;
+    margin-bottom: 16px;
+}
+
+.admin-meta-list {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.admin-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5px;
+}
+
+.admin-meta-label {
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-meta-value {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.permission-list {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.permission-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+}
+
+.permission-pill-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.perm-pill {
+    font-size: 11.5px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.perm-pill svg {
+    color: #10b981;
+}
+
+/* Right Column: Settings Sections */
+.settings-section-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.03);
+    margin-bottom: 22px;
+    overflow: hidden;
+}
+
+.settings-card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fafafa;
+}
+
+.settings-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fff1f2;
+    color: #e11d48;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.settings-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.settings-card-header p {
+    margin: 2px 0 0 0;
+    font-size: 12.5px;
+    color: #64748b;
+}
+
+.settings-card-body {
+    padding: 24px;
+}
+
+/* Form Styles */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+@media (max-width: 600px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pro-form-group {
+    margin-bottom: 18px;
+}
+
+.pro-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.pro-form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 7px;
+}
+
+.pro-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pro-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pro-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px 0 42px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #ffffff;
+    transition: all 0.18s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.pro-input:focus {
+    border-color: #e11d48;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.14);
+}
+
+.pro-input::placeholder {
+    color: #94a3b8;
+}
+
+.pro-input-btn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+}
+
+.pro-input-btn:hover {
+    color: #0f172a;
+}
+
+.pro-input-hint {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+    display: block;
+    line-height: 1.4;
+}
+
+/* Upload Dropzone */
+.avatar-dropzone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+    background-color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.avatar-dropzone:hover, .avatar-dropzone.dragover {
+    border-color: #e11d48;
+    background-color: #fff1f2;
+}
+
+.avatar-dropzone-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #e11d48;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.avatar-dropzone-text {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.avatar-dropzone-sub {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.file-selected-status {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    font-size: 12.5px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Save Bar */
+.form-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-admin-save {
+    height: 46px;
+    padding: 0 28px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid #f43f5e;
+    box-shadow: 0 2px 10px rgba(225, 29, 72, 0.35);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s ease;
+}
+
+.btn-admin-save:hover {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45);
+}
+
+.btn-cancel-link {
+    height: 46px;
+    padding: 0 20px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-cancel-link:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #94a3b8;
+    text-decoration: none;
+}
+</style>
+
+<div class="admin-profile-container">
+    <!-- Top Header -->
+    <div class="admin-header-row">
         <div>
-            {% if admin.profile_image %}
-                <img src="{{ url_for('uploaded_file', filename=admin.profile_image) }}" alt="Avatar" class="account-avatar-lg" style="width: 76px; height: 76px;">
-            {% else %}
-                <div class="user-avatar-circle" style="width: 76px; height: 76px; font-size: 30px; background: linear-gradient(135deg, #e11d48, #be123c); border: 3px solid #ffffff; box-shadow: var(--shadow-md);">
-                    {{ admin.first_name[:1]|upper }}
-                </div>
-            {% endif %}
+            <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.02em;">
+                Administrator Profile &amp; Settings
+            </h1>
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
+                Configure administrative credentials, system contact info, security passwords, and executive avatar
+            </p>
         </div>
-        <div>
-            <h3 style="margin: 0 0 4px 0; font-size: 20px;">{{ admin.first_name }} {{ admin.last_name }}</h3>
-            <div style="color: #64748b; font-size: 13.5px; margin-bottom: 8px;">{{ admin.e_mail }}</div>
-            <span class="badge badge-danger">
-                ● System Role: Store Administrator
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 12.5px; font-weight: 600; color: #10b981; display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 5px 12px; border-radius: 20px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                Super Admin Active
             </span>
         </div>
     </div>
 
-    <form method="POST" action="{{ url_for('admin_profile') }}" enctype="multipart/form-data">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div class="form-group">
-                <label class="form-label">First Name</label>
-                <input type="text" name="first_name" value="{{ admin.first_name }}" required>
+    <!-- Main Grid -->
+    <div class="admin-profile-grid">
+        <!-- Left: Executive Identity Card -->
+        <aside class="admin-id-card">
+            <div class="admin-card-banner"></div>
+            <div class="admin-avatar-wrapper">
+                <div class="admin-avatar-box">
+                    {% if admin.profile_image %}
+                        <img id="live-avatar-preview" src="{{ url_for('uploaded_file', filename=admin.profile_image) }}" alt="Admin Avatar" class="admin-avatar-img">
+                    {% else %}
+                        <div id="live-avatar-fallback" class="admin-avatar-fallback">
+                            {{ admin.first_name[:1]|upper }}
+                        </div>
+                        <img id="live-avatar-preview" src="" alt="Admin Avatar" class="admin-avatar-img" style="display: none;">
+                    {% endif %}
+
+                    <label for="admin-photo-input" class="admin-avatar-trigger-btn" title="Choose new avatar photo">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </label>
+                </div>
+
+                <span class="admin-badge-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Store Admin
+                </span>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Last Name</label>
-                <input type="text" name="last_name" value="{{ admin.last_name }}">
+            <div class="admin-card-body">
+                <h2 class="admin-card-name">{{ admin.first_name }} {{ admin.last_name }}</h2>
+                <div class="admin-card-email">{{ admin.e_mail }}</div>
+
+                <div class="admin-meta-list">
+                    <div class="admin-meta-row">
+                        <span class="admin-meta-label">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Account ID
+                        </span>
+                        <span class="admin-meta-value">#ADM-{{ admin.customer_id }}</span>
+                    </div>
+
+                    <div class="admin-meta-row">
+                        <span class="admin-meta-label">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            Phone
+                        </span>
+                        <span class="admin-meta-value">{{ admin.phone_number if admin.phone_number and admin.phone_number != '0000000000' else 'Not Specified' }}</span>
+                    </div>
+
+                    <div class="admin-meta-row">
+                        <span class="admin-meta-label">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Status
+                        </span>
+                        <span class="admin-meta-value" style="color: #059669;">Verified Active</span>
+                    </div>
+                </div>
+
+                <div class="permission-list">
+                    <div class="permission-title">Admin Privileges &amp; Scope</div>
+                    <div class="permission-pill-wrap">
+                        <span class="perm-pill">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Full Catalog CRUD
+                        </span>
+                        <span class="perm-pill">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Customer Orders
+                        </span>
+                        <span class="perm-pill">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Categories
+                        </span>
+                        <span class="perm-pill">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Financial Audits
+                        </span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </aside>
 
-        <div class="form-group">
-            <label class="form-label">Admin Email Address</label>
-            <input type="email" name="email" value="{{ admin.e_mail }}" required>
-        </div>
+        <!-- Right: Professional Edit Form -->
+        <main>
+            <form method="POST" action="{{ url_for('admin_profile') }}" enctype="multipart/form-data" id="admin-profile-form">
+                <!-- Section 1: Personal Credentials -->
+                <div class="settings-section-card">
+                    <div class="settings-card-header">
+                        <div class="settings-header-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Personal Credentials</h3>
+                            <p>Update administrator name, primary login email, and direct contact details</p>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-            <label class="form-label">Mobile Phone Number</label>
-            <input type="text" name="phone_number" value="{{ admin.phone_number if admin.phone_number != '0000000000' else '' }}" placeholder="Mobile number">
-        </div>
+                    <div class="settings-card-body">
+                        <div class="form-grid-2">
+                            <div class="pro-form-group">
+                                <label class="pro-form-label">First Name *</label>
+                                <div class="pro-input-wrap">
+                                    <span class="pro-input-icon">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    </span>
+                                    <input type="text" name="first_name" class="pro-input" value="{{ admin.first_name }}" required placeholder="e.g. Shabber">
+                                </div>
+                            </div>
 
-        <div class="form-group">
-            <label class="form-label">Rotate Password (Optional)</label>
-            <input type="password" name="password" placeholder="Leave blank to keep existing password">
-            <span style="font-size: 11.5px; color: #94a3b8; margin-top: 4px; display: block;">Only fill this field if you want to update your admin credentials.</span>
-        </div>
+                            <div class="pro-form-group">
+                                <label class="pro-form-label">Last Name</label>
+                                <div class="pro-input-wrap">
+                                    <span class="pro-input-icon">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    </span>
+                                    <input type="text" name="last_name" class="pro-input" value="{{ admin.last_name }}" placeholder="e.g. Hussain">
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label class="form-label">Upload Profile Avatar (Optional)</label>
-            <input 
-                type="file" 
-                name="profile_image" 
-                accept="image/*" 
-                style="padding: 8px; border: 1.5px dashed var(--slate-300); height: auto; border-radius: 10px; background: var(--slate-50);"
-            >
-        </div>
+                        <div class="form-grid-2" style="margin-top: 18px;">
+                            <div class="pro-form-group">
+                                <label class="pro-form-label">Administrator Email Address *</label>
+                                <div class="pro-input-wrap">
+                                    <span class="pro-input-icon">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    </span>
+                                    <input type="email" name="email" class="pro-input" value="{{ admin.e_mail }}" required placeholder="admin@store.com">
+                                </div>
+                                <span class="pro-input-hint">Used for order transaction receipts and alerts.</span>
+                            </div>
 
-        <div style="display: flex; gap: 12px; align-items: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--slate-100);">
-            <button type="submit" class="btn btn-admin" style="height: 44px; padding: 0 24px;">
-                Save Admin Profile
-            </button>
-            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="height: 44px;">
-                Cancel
-            </a>
-        </div>
-    </form>
+                            <div class="pro-form-group">
+                                <label class="pro-form-label">Direct Contact Phone Number</label>
+                                <div class="pro-input-wrap">
+                                    <span class="pro-input-icon">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                    </span>
+                                    <input type="text" name="phone_number" class="pro-input" value="{{ admin.phone_number if admin.phone_number and admin.phone_number != '0000000000' else '' }}" placeholder="+91 97040 39617">
+                                </div>
+                                <span class="pro-input-hint">Direct telephone for emergency dispatch alerts.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Security & Password -->
+                <div class="settings-section-card">
+                    <div class="settings-card-header">
+                        <div class="settings-header-icon" style="background: #eff6ff; color: #2563eb;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Security &amp; Password Access</h3>
+                            <p>Rotate administrator login credentials to safeguard platform store controls</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-card-body">
+                        <div class="pro-form-group">
+                            <label class="pro-form-label">New Password (Optional)</label>
+                            <div class="pro-input-wrap">
+                                <span class="pro-input-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </span>
+                                <input type="password" name="password" id="admin-password-input" class="pro-input" placeholder="Leave empty to maintain existing password" minlength="6" autocomplete="new-password">
+                                <button type="button" class="pro-input-btn" onclick="togglePasswordVisibility()" title="Show/Hide Password">
+                                    <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <span class="pro-input-hint">Minimum 6 characters. If you do not wish to change your password, leave this field completely blank.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Profile Photo / Avatar -->
+                <div class="settings-section-card">
+                    <div class="settings-card-header">
+                        <div class="settings-header-icon" style="background: #faf5ff; color: #7e22ce;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Executive Profile Photo</h3>
+                            <p>Upload a high-resolution portrait or corporate avatar for your administrator profile</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-card-body">
+                        <label for="admin-photo-input" class="avatar-dropzone" id="avatar-dropzone">
+                            <div class="avatar-dropzone-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="avatar-dropzone-text">Click to choose a photo or drag and drop here</div>
+                            <div class="avatar-dropzone-sub">PNG, JPG, WEBP, or GIF up to 5MB</div>
+                        </label>
+
+                        <input 
+                            type="file" 
+                            name="profile_image" 
+                            id="admin-photo-input" 
+                            accept="image/*" 
+                            style="display: none;"
+                            onchange="previewAdminAvatar(this)"
+                        >
+
+                        <div id="file-selected-status" class="file-selected-status">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span id="file-selected-name">Photo selected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-action-bar">
+                    <button type="submit" class="btn-admin-save">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        <span>Save Profile Changes</span>
+                    </button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn-cancel-link">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </form>
+        </main>
+    </div>
 </div>
+
+<script>
+    // Live Avatar Preview Handler
+    function previewAdminAvatar(input) {
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                var previewImg = document.getElementById('live-avatar-preview');
+                var fallback = document.getElementById('live-avatar-fallback');
+                if (previewImg) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                }
+                if (fallback) {
+                    fallback.style.display = 'none';
+                }
+
+                // Show selected filename badge
+                var statusBox = document.getElementById('file-selected-status');
+                var nameSpan = document.getElementById('file-selected-name');
+                if (statusBox && nameSpan) {
+                    nameSpan.textContent = "Selected: " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+                    statusBox.style.display = 'inline-flex';
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Toggle Password Visibility
+    function togglePasswordVisibility() {
+        var input = document.getElementById('admin-password-input');
+        var icon = document.getElementById('eye-icon');
+        if (!input) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) {
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
+        } else {
+            input.type = 'password';
+            if (icon) {
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        }
+    }
+
+    // Drag and Drop Effects on Dropzone
+    (function() {
+        var dropzone = document.getElementById('avatar-dropzone');
+        var fileInput = document.getElementById('admin-photo-input');
+        if (!dropzone || !fileInput) return;
+
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', function(e) {
+            var dt = e.dataTransfer;
+            if (dt && dt.files && dt.files.length) {
+                fileInput.files = dt.files;
+                previewAdminAvatar(fileInput);
+            }
+        }, false);
+    })();
+</script>
 {% endblock %}

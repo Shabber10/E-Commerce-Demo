@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,153 @@
     <!-- Modern Typography: Plus Jakarta Sans & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- Main CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=9.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=13.0">
+    <style>
+        .dropdown:hover .dropdown-menu { display: none; }
+        .dropdown-menu.show { display: block !important; }
+        .dropdown-toggle:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+
+        /* Bottom-Right Corner Flash Popups */
+        .flash-popup-stack {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            pointer-events: none;
+            max-width: 400px;
+            width: calc(100% - 48px);
+        }
+
+        .flash-popup-item {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.22), 0 4px 12px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #2563eb;
+            animation: flashPopupSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        @keyframes flashPopupSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(28px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .flash-popup-item.fade-out {
+            opacity: 0;
+            transform: translateY(16px) scale(0.94);
+            pointer-events: none;
+        }
+
+        .flash-popup-item.flash-success {
+            border-left-color: #10b981;
+        }
+        .flash-popup-item.flash-success .flash-popup-icon {
+            color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .flash-popup-item.flash-danger {
+            border-left-color: #ef4444;
+        }
+        .flash-popup-item.flash-danger .flash-popup-icon {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .flash-popup-item.flash-warning {
+            border-left-color: #f59e0b;
+        }
+        .flash-popup-item.flash-warning .flash-popup-icon {
+            color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .flash-popup-item.flash-info {
+            border-left-color: #2563eb;
+        }
+        .flash-popup-item.flash-info .flash-popup-icon {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .flash-popup-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .flash-popup-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .flash-popup-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.3;
+            margin-bottom: 2px;
+        }
+
+        .flash-popup-msg {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .flash-popup-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 4px;
+            transition: color 0.15s ease;
+            align-self: flex-start;
+            margin-top: -3px;
+        }
+
+        .flash-popup-close:hover {
+            color: #0f172a;
+        }
+
+        @media (max-width: 480px) {
+            .flash-popup-stack {
+                right: 16px;
+                bottom: 16px;
+                width: calc(100% - 32px);
+            }
+        }
+    </style>
 </head>
+
 <body>
 
     <!-- Executive Site Header -->
@@ -19,27 +163,30 @@
             <div class="navbar-brand-wrap">
                 <a href="{{ url_for('index') }}" class="navbar-brand">
                     <span class="brand-icon-pill">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="9" cy="21" r="1"></circle>
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                         </svg>
                     </span>
                     <span class="brand-text">E-Commerce Demo</span>
-                    <span class="brand-badge">DEMO</span>
                 </a>
             </div>
 
             <!-- Mobile Navigation Triggers -->
             <div class="navbar-mobile-actions">
+                {% if not (current_user.is_authenticated and current_user.role == 'admin') %}
                 <a href="{{ url_for('cart_view') }}" class="mobile-cart-badge-link" title="Shopping Cart">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
                     <span class="cart-badge" id="cart-count-mobile">{{ cart_count }}</span>
                 </a>
+                {% endif %}
                 <button type="button" class="navbar-toggler" onclick="toggleMobileNav()" aria-label="Toggle Navigation">
                     <span id="nav-toggler-icon">&#9776;</span>
                 </button>
@@ -47,18 +194,83 @@
 
             <!-- Desktop Navigation Links -->
             <ul class="desktop-nav-links">
+                {% if current_user.is_authenticated %}
+                {% if current_user.role == 'admin' %}
+                <!-- Admin Navigation Bar -->
                 <li>
-                    <a href="{{ url_for('index') }}">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    <a href="{{ url_for('admin_dashboard') }}" class="admin-top-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
                         </svg>
-                        <span>Store Catalog</span>
+                        <span>Admin Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('cart_view') }}" class="cart-link-pill">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="{{ url_for('admin_products') }}" class="admin-top-link {% if request.endpoint in ['admin_products', 'admin_view_item'] %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        <span>Manage Products</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_product_add') }}" class="admin-top-link {% if request.endpoint in ['admin_product_add', 'admin_product_edit'] %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Add Product</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_categories') }}" class="admin-top-link {% if request.endpoint == 'admin_categories' %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_orders') }}" class="admin-top-link {% if request.endpoint == 'admin_orders' %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span>Customer Orders</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_profile') }}" class="admin-top-link {% if request.endpoint == 'admin_profile' %}active{% endif %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Admin Profile</span>
+                    </a>
+                </li>
+                {% else %}
+                <!-- Customer Navigation Links -->
+                <li>
+                    <a href="{{ url_for('index') }}">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('cart_view') }}" title="View Shopping Cart">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="9" cy="21" r="1"></circle>
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -67,95 +279,126 @@
                         <span class="cart-badge" id="cart-count">{{ cart_count }}</span>
                     </a>
                 </li>
+                {% endif %}
 
-                {% if current_user.is_authenticated %}
-                    {% if current_user.role == 'admin' %}
-                        <li>
-                            <a href="{{ url_for('admin_dashboard') }}" class="admin-link">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
-                                <span>Admin Portal</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li>
+                <!-- Desktop User Dropdown Menu -->
+                <li class="dropdown" style="margin-left: 10px; flex-shrink: 0;">
+                    <div class="dropdown-toggle" onclick="toggleDropdownMenu(event)">
+                        {% if current_user.profile_image %}
+                        <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar"
+                            style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ffffff;">
+                        {% else %}
+                        <span class="user-avatar-circle">{{ current_user.name[:1]|upper }}</span>
+                        {% endif %}
+                        <span>{{ current_user.name }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" style="margin-left: 2px;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="dropdown-menu" id="desktop-user-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-header-name">{{ current_user.name }}</div>
+                            <div class="dropdown-header-email">{{ current_user.email }}</div>
+                            <div style="margin-top: 5px;">
+                                <span
+                                    class="badge {% if current_user.role == 'admin' %}badge-danger{% else %}badge-info{% endif %}"
+                                    style="font-size: 10px; padding: 2px 7px;">
+                                    {{ current_user.role|upper }}
+                                </span>
+                            </div>
+                        </div>
+                        {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            <span>Admin Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('admin_profile') }}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Admin Profile</span>
+                        </a>
+                        <a href="{{ url_for('index') }}" target="_blank">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            <span>Live Storefront</span>
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('dashboard') }}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            <span>Account Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('profile') }}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Profile Settings</span>
+                        </a>
                         <a href="{{ url_for('customer_orders') }}">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                </path>
                                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
                             </svg>
-                            <span>My Orders</span>
+                            <span>Order History</span>
                         </a>
-                    </li>
-
-                    <!-- Desktop User Dropdown Menu -->
-                    <li class="dropdown">
-                        <div class="dropdown-toggle" onclick="toggleDropdownMenu(event)">
-                            {% if current_user.profile_image %}
-                                <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ffffff;">
-                            {% else %}
-                                <span class="user-avatar-circle">{{ current_user.name[:1]|upper }}</span>
-                            {% endif %}
-                            <span>{{ current_user.name }}</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 2px;">
-                                <polyline points="6 9 12 15 18 9"></polyline>
+                        <a href="{{ url_for('updatepassword') }}">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
-                        </div>
-                        <div class="dropdown-menu" id="desktop-user-dropdown">
-                            <div class="dropdown-header">
-                                <div class="dropdown-header-name">{{ current_user.name }}</div>
-                                <div class="dropdown-header-email">{{ current_user.email }}</div>
-                                <div style="margin-top: 5px;">
-                                    <span class="badge {% if current_user.role == 'admin' %}badge-danger{% else %}badge-info{% endif %}" style="font-size: 10px; padding: 2px 7px;">
-                                        {{ current_user.role|upper }}
-                                    </span>
-                                </div>
-                            </div>
-                            <a href="{{ url_for('dashboard') }}">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                                <span>Account Dashboard</span>
-                            </a>
-                            <a href="{{ url_for('profile') }}">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                <span>Profile Settings</span>
-                            </a>
-                            <a href="{{ url_for('customer_orders') }}">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                                <span>Order History</span>
-                            </a>
-                            <a href="{{ url_for('updatepassword') }}">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                <span>Security &amp; Password</span>
-                            </a>
-                            {% if current_user.role == 'admin' %}
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ url_for('admin_dashboard') }}" style="color: #e11d48 !important; font-weight: 700;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    <span>Admin Control Panel</span>
-                                </a>
-                            {% endif %}
-                            <div class="dropdown-divider"></div>
-                            <a href="{{ url_for('logout') }}" style="color: #ef4444 !important; font-weight: 700;">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                                <span>Sign Out</span>
-                            </a>
-                        </div>
-                    </li>
+                            <span>Security &amp; Password</span>
+                        </a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('logout') }}" style="color: #ef4444 !important; font-weight: 700;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Sign Out</span>
+                        </a>
+                    </div>
+                </li>
                 {% else %}
-                    <li><a href="{{ url_for('login') }}">Sign In</a></li>
-                    <li>
-                        <a href="{{ url_for('register') }}" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff !important; box-shadow: 0 4px 12px rgba(37,99,235,0.35);">
-                            Create Account
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('admin_login') }}" style="background: rgba(255, 255, 255, 0.08); font-size: 12px; color: #94a3b8;">
-                            Admin
-                        </a>
-                    </li>
+                <li><a href="{{ url_for('login') }}">Sign In</a></li>
+                <li>
+                    <a href="{{ url_for('register') }}"
+                        style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff !important; box-shadow: 0 4px 12px rgba(37,99,235,0.35);">
+                        Create Account
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_login') }}"
+                        style="background: rgba(255, 255, 255, 0.08); font-size: 12px; color: #94a3b8;">
+                        Admin
+                    </a>
+                </li>
                 {% endif %}
             </ul>
         </nav>
@@ -163,36 +406,47 @@
         <!-- Mobile Drawer -->
         <div class="mobile-drawer" id="mobile-nav-drawer">
             {% if current_user.is_authenticated %}
-                <div class="mobile-user-banner">
-                    {% if current_user.profile_image %}
-                        <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff;">
-                    {% else %}
-                        <span class="user-avatar-circle" style="width: 38px; height: 38px; font-size: 15px;">{{ current_user.name[:1]|upper }}</span>
-                    {% endif %}
-                    <div>
-                        <div style="font-weight: 700; color: #ffffff; font-size: 14px;">{{ current_user.name }}</div>
-                        <div style="font-size: 12px; color: #94a3b8;">{{ current_user.email }}</div>
-                    </div>
+            <div class="mobile-user-banner">
+                {% if current_user.profile_image %}
+                <img src="{{ url_for('uploaded_file', filename=current_user.profile_image) }}" alt="Avatar"
+                    style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff;">
+                {% else %}
+                <span class="user-avatar-circle" style="width: 38px; height: 38px; font-size: 15px;">{{
+                    current_user.name[:1]|upper }}</span>
+                {% endif %}
+                <div>
+                    <div style="font-weight: 700; color: #ffffff; font-size: 14px;">{{ current_user.name }}</div>
+                    <div style="font-size: 12px; color: #94a3b8;">{{ current_user.email }}</div>
                 </div>
+            </div>
             {% endif %}
 
             <div class="mobile-drawer-links">
-                <a href="{{ url_for('index') }}">Store Catalog</a>
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <!-- Admin Navigation in Mobile Drawer -->
+                <a href="{{ url_for('admin_dashboard') }}" style="color: #f43f5e !important; font-weight: 700;">Admin Dashboard</a>
+                <a href="{{ url_for('admin_products') }}">Manage Products</a>
+                <a href="{{ url_for('admin_product_add') }}">+ Add Product</a>
+                <a href="{{ url_for('admin_categories') }}">Categories</a>
+                <a href="{{ url_for('admin_orders') }}">Customer Orders</a>
+                <a href="{{ url_for('admin_profile') }}">Admin Profile</a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('logout') }}" style="color: #f87171 !important; font-weight: 700;">Sign Out</a>
+                {% elif current_user.is_authenticated %}
+                <a href="{{ url_for('index') }}">Home</a>
                 <a href="{{ url_for('cart_view') }}">Shopping Cart ({{ cart_count }})</a>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('customer_orders') }}">My Orders</a>
-                    <a href="{{ url_for('dashboard') }}">Account Dashboard</a>
-                    <a href="{{ url_for('profile') }}">Profile Settings</a>
-                    <a href="{{ url_for('updatepassword') }}">Change Password</a>
-                    {% if current_user.role == 'admin' %}
-                        <a href="{{ url_for('admin_dashboard') }}" style="color: #f43f5e !important; font-weight: 700;">Admin Control Panel</a>
-                    {% endif %}
-                    <div class="dropdown-divider"></div>
-                    <a href="{{ url_for('logout') }}" style="color: #f87171 !important; font-weight: 700;">Sign Out</a>
+                <a href="{{ url_for('customer_orders') }}">My Orders</a>
+                <a href="{{ url_for('dashboard') }}">Account Dashboard</a>
+                <a href="{{ url_for('profile') }}">Profile Settings</a>
+                <a href="{{ url_for('updatepassword') }}">Change Password</a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('logout') }}" style="color: #f87171 !important; font-weight: 700;">Sign Out</a>
                 {% else %}
-                    <a href="{{ url_for('login') }}">Sign In</a>
-                    <a href="{{ url_for('register') }}" style="color: #60a5fa !important;">Create Account</a>
-                    <a href="{{ url_for('admin_login') }}">Admin Portal</a>
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('cart_view') }}">Shopping Cart ({{ cart_count }})</a>
+                <a href="{{ url_for('login') }}">Sign In</a>
+                <a href="{{ url_for('register') }}" style="color: #60a5fa !important;">Create Account</a>
+                <a href="{{ url_for('admin_login') }}">Admin Portal</a>
                 {% endif %}
             </div>
         </div>
@@ -200,31 +454,6 @@
 
     <!-- Main Container -->
     <div class="site-wrapper">
-        <!-- Flash Alerts Container -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div id="flash-messages" style="max-width: 800px; margin: 0 auto 20px;">
-                    {% for category, message in messages %}
-                        <div class="site-alert site-alert-{{ category }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-radius: 12px; font-size: 13.5px; font-weight: 600; margin-bottom: 10px; box-shadow: var(--shadow-sm); {% if category == 'success' %}background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;{% elif category == 'danger' %}background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;{% elif category == 'warning' %}background: #fffbeb; color: #92400e; border: 1px solid #fde68a;{% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                {% if category == 'success' %}
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                {% elif category == 'danger' %}
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                {% elif category == 'warning' %}
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                {% else %}
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                {% endif %}
-                                <span>{{ message }}</span>
-                            </div>
-                            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; padding: 2px 6px; cursor: pointer; color: inherit; opacity: 0.65; font-size: 18px; line-height: 1;">&times;</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
         <!-- Content Block -->
         <main>
             {% block content %}{% endblock %}
@@ -233,7 +462,9 @@
 
     <!-- Global Toast Container -->
     <div id="site-toast" class="toast-notice">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
         <span id="toast-message">Item updated</span>
     </div>
 
@@ -244,7 +475,8 @@
             <div class="footer-brand-col">
                 <div class="footer-brand-title">
                     <span class="brand-icon-pill" style="width: 28px; height: 28px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
                             <circle cx="9" cy="21" r="1"></circle>
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -253,15 +485,23 @@
                     <span>E-Commerce Demo</span>
                 </div>
                 <p class="footer-desc">
-                    Modern e-commerce demo project engineered for fast shopping, real-time inventory synchronization, and verified checkout.
+                    Modern e-commerce demo project engineered for fast shopping, real-time inventory synchronization,
+                    and verified checkout.
                 </p>
                 <div class="footer-trust-badges">
                     <span class="badge-trust ssl">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
                         <span>256-Bit SSL Secured</span>
                     </span>
                     <span class="badge-trust ajax">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
                         <span>Instant AJAX Cart</span>
                     </span>
                 </div>
@@ -272,20 +512,28 @@
                 <div class="footer-col">
                     <h4 class="footer-heading">Catalog</h4>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> All Categories</a></li>
-                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> Featured Deals</a></li>
-                        <li><a href="{{ url_for('cart_view') }}"><span class="footer-arrow">&rsaquo;</span> Shopping Cart</a></li>
-                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Track Shipments</a></li>
+                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> All
+                                Categories</a></li>
+                        <li><a href="{{ url_for('index') }}"><span class="footer-arrow">&rsaquo;</span> Featured
+                                Deals</a></li>
+                        <li><a href="{{ url_for('cart_view') }}"><span class="footer-arrow">&rsaquo;</span> Shopping
+                                Cart</a></li>
+                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Track
+                                Shipments</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4 class="footer-heading">Customer Hub</h4>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('dashboard') }}"><span class="footer-arrow">&rsaquo;</span> My Dashboard</a></li>
-                        <li><a href="{{ url_for('profile') }}"><span class="footer-arrow">&rsaquo;</span> Profile &amp; Security</a></li>
-                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Tax Invoices</a></li>
-                        <li><a href="{{ url_for('admin_login') }}"><span class="footer-arrow">&rsaquo;</span> Merchant Access</a></li>
+                        <li><a href="{{ url_for('dashboard') }}"><span class="footer-arrow">&rsaquo;</span> My
+                                Dashboard</a></li>
+                        <li><a href="{{ url_for('profile') }}"><span class="footer-arrow">&rsaquo;</span> Profile &amp;
+                                Security</a></li>
+                        <li><a href="{{ url_for('customer_orders') }}"><span class="footer-arrow">&rsaquo;</span> Tax
+                                Invoices</a></li>
+                        <li><a href="{{ url_for('admin_login') }}"><span class="footer-arrow">&rsaquo;</span> Merchant
+                                Access</a></li>
                     </ul>
                 </div>
             </div>
@@ -295,7 +543,7 @@
                 <div class="footer-security-card">
                     <div class="security-card-header">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                         </svg>
                         <h4 class="footer-heading" style="margin: 0;">Payment Security</h4>
                     </div>
@@ -313,61 +561,195 @@
             </div>
         </div>
 
-        <div class="footer-bottom">
-            <div class="footer-copy">
-                &copy; 2026 <b>E-Commerce Demo Project</b>. All rights reserved.
-            </div>
-            <div class="footer-bottom-links">
-                <a href="{{ url_for('index') }}" class="footer-chip-link">Home</a>
-                <a href="{{ url_for('cart_view') }}" class="footer-chip-link">Cart</a>
-                <a href="{{ url_for('admin_login') }}" class="footer-chip-link admin">Admin Portal</a>
-            </div>
-        </div>
+
     </footer>
+
+    <!-- Bottom-Right Flash Popup Notifications Stack -->
+    <div id="flash-popup-container" class="flash-popup-stack">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-popup-item flash-{{ category }}" role="alert">
+                <div class="flash-popup-icon">
+                    {% if category == 'success' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    {% elif category == 'danger' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    {% elif category == 'warning' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    {% endif %}
+                </div>
+                <div class="flash-popup-content">
+                    <div class="flash-popup-title">
+                        {% if category == 'success' %}Success
+                        {% elif category == 'danger' %}Notice
+                        {% elif category == 'warning' %}Attention
+                        {% else %}Notification
+                        {% endif %}
+                    </div>
+                    <div class="flash-popup-msg">{{ message }}</div>
+                </div>
+                <button type="button" class="flash-popup-close" onclick="dismissFlashPopup(this)" aria-label="Close notification">&times;</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
 
     <!-- Global Navigation & Toast Scripts -->
     <script>
-    function toggleMobileNav() {
-        var drawer = document.getElementById('mobile-nav-drawer');
-        var icon = document.getElementById('nav-toggler-icon');
-        if (drawer) {
-            drawer.classList.toggle('open');
-            if (icon) {
-                icon.innerHTML = drawer.classList.contains('open') ? '&times;' : '&#9776;';
+        function toggleMobileNav() {
+            var drawer = document.getElementById('mobile-nav-drawer');
+            var icon = document.getElementById('nav-toggler-icon');
+            if (drawer) {
+                drawer.classList.toggle('open');
+                if (icon) {
+                    icon.innerHTML = drawer.classList.contains('open') ? '&times;' : '&#9776;';
+                }
             }
         }
-    }
 
-    function toggleDropdownMenu(e) {
-        if (e) e.stopPropagation();
-        var menu = document.getElementById('desktop-user-dropdown');
-        if (menu) {
-            menu.classList.toggle('show');
-        }
-    }
-
-    document.addEventListener('click', function(e) {
-        var menu = document.getElementById('desktop-user-dropdown');
-        if (menu && menu.classList.contains('show')) {
-            if (!menu.contains(e.target)) {
-                menu.classList.remove('show');
+        function toggleDropdownMenu(e) {
+            if (e) e.stopPropagation();
+            var menu = document.getElementById('desktop-user-dropdown');
+            if (menu) {
+                menu.classList.toggle('show');
             }
         }
-    });
 
-    function showToast(message) {
-        var toast = document.getElementById('site-toast');
-        var msg = document.getElementById('toast-message');
-        if (toast && msg) {
-            msg.textContent = message;
-            toast.classList.add('show');
-            setTimeout(function() {
-                toast.classList.remove('show');
-            }, 3000);
+        document.addEventListener('click', function (e) {
+            var menu = document.getElementById('desktop-user-dropdown');
+            if (menu && menu.classList.contains('show')) {
+                if (!menu.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            }
+        });
+
+        // Flash Popup Dismiss and Auto-Timer
+        function dismissFlashPopup(btn) {
+            var item = btn.closest('.flash-popup-item');
+            if (item) {
+                item.classList.add('fade-out');
+                setTimeout(function() {
+                    if (item.parentNode) item.remove();
+                }, 260);
+            }
         }
-    }
+
+        function scheduleFlashDismiss() {
+            var items = document.querySelectorAll('.flash-popup-item:not([data-auto-dismiss])');
+            items.forEach(function(item) {
+                item.setAttribute('data-auto-dismiss', 'true');
+                setTimeout(function() {
+                    if (item && item.parentNode) {
+                        item.classList.add('fade-out');
+                        setTimeout(function() {
+                            if (item.parentNode) item.remove();
+                        }, 260);
+                    }
+                }, 5000);
+            });
+        }
+
+        function showToast(message, category) {
+            category = category || 'success';
+            var container = document.getElementById('flash-popup-container');
+            if (!container) return;
+            var item = document.createElement('div');
+            item.className = 'flash-popup-item flash-' + category;
+            item.setAttribute('role', 'alert');
+            
+            var iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            var title = 'Success';
+            if (category === 'danger') {
+                iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+                title = 'Notice';
+            } else if (category === 'warning') {
+                iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+                title = 'Attention';
+            } else if (category === 'info') {
+                iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                title = 'Information';
+            }
+
+            item.innerHTML = '<div class="flash-popup-icon">' + iconSvg + '</div>' +
+                '<div class="flash-popup-content">' +
+                '<div class="flash-popup-title">' + title + '</div>' +
+                '<div class="flash-popup-msg">' + message + '</div>' +
+                '</div>' +
+                '<button type="button" class="flash-popup-close" onclick="dismissFlashPopup(this)">&times;</button>';
+
+            container.appendChild(item);
+            scheduleFlashDismiss();
+        }
+
+        document.addEventListener('DOMContentLoaded', scheduleFlashDismiss);
+        scheduleFlashDismiss();
+
+        // Global Universal Password Eye Toggle
+        function initPasswordToggles() {
+            var eyeSvg = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            var eyeOffSvg = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+
+            var passInputs = document.querySelectorAll('input[type="password"]');
+            passInputs.forEach(function(input) {
+                var wrapper = input.closest('.input-wrapper, .pro-input-wrap');
+                if (!wrapper) return;
+
+                var existingBtn = wrapper.querySelector('.password-toggle-btn, .pro-input-btn');
+                if (!existingBtn) {
+                    existingBtn = document.createElement('button');
+                    existingBtn.type = 'button';
+                    existingBtn.className = 'password-toggle-btn';
+                    existingBtn.title = 'Show password';
+                    existingBtn.setAttribute('aria-label', 'Toggle password visibility');
+                    existingBtn.innerHTML = eyeSvg;
+                    wrapper.appendChild(existingBtn);
+                }
+
+                if (!existingBtn.hasAttribute('data-toggle-bound')) {
+                    existingBtn.setAttribute('data-toggle-bound', 'true');
+                    existingBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            existingBtn.innerHTML = eyeOffSvg;
+                            existingBtn.title = 'Hide password';
+                            existingBtn.style.color = '#2563eb';
+                        } else {
+                            input.type = 'password';
+                            existingBtn.innerHTML = eyeSvg;
+                            existingBtn.title = 'Show password';
+                            existingBtn.style.color = '';
+                        }
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initPasswordToggles);
+        initPasswordToggles();
     </script>
 
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

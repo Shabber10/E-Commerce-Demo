@@ -6,12 +6,7 @@
 <div class="auth-page">
     <div class="auth-card admin-card">
         <div class="auth-header">
-            <div class="auth-badge-wrapper">
-                <span class="auth-badge admin">
-                    <span class="badge-dot"></span> Administrator Portal
-                </span>
-            </div>
-
+            
             <div class="auth-icon-wrap admin">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
@@ -20,7 +15,6 @@
             </div>
 
             <h1 class="auth-title">Admin Sign In</h1>
-            <p class="auth-subtitle">Restricted gateway for store management and authorized personnel</p>
         </div>
 
         <form action="{{ url_for('admin_login') }}" method="POST">
@@ -60,6 +54,9 @@
                         required 
                         autocomplete="current-password"
                     >
+                    <button type="button" class="password-toggle-btn" title="Toggle password visibility" aria-label="Toggle password visibility">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
                 </div>
             </div>
 
@@ -87,12 +84,6 @@
                 <a href="{{ url_for('index') }}" class="auth-nav-link">Store Front</a>
             </div>
 
-            <div class="auth-trust-footer">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                <span>Encrypted Store Administration</span>
-            </div>
         </div>
     </div>
 </div>
