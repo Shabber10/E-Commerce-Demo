@@ -104,6 +104,10 @@
                                             </svg>
                                             Paid
                                         </span>
+                                    {% elif ord.payment_status == 'unpaid' %}
+                                        <span class="badge badge-warning" style="padding: 4px 10px; border-radius: 9999px; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;">
+                                            Unpaid (COD)
+                                        </span>
                                     {% else %}
                                         <span class="badge badge-warning" style="padding: 4px 10px; border-radius: 9999px;">
                                             {{ ord.payment_status|capitalize or 'Pending' }}
@@ -189,6 +193,8 @@
                     <div>
                         {% if ord.payment_status == 'completed' %}
                             <span class="badge badge-success">Paid</span>
+                        {% elif ord.payment_status == 'unpaid' %}
+                            <span class="badge badge-warning" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;">Unpaid (COD)</span>
                         {% else %}
                             <span class="badge badge-warning">{{ ord.payment_status|capitalize or 'Pending' }}</span>
                         {% endif %}

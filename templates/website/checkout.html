@@ -74,62 +74,64 @@
             </div>
             <p style="color: var(--slate-500); font-size: 13.5px; margin-bottom: 16px;">Select your preferred payment method.</p>
             
-            <!-- Payment Mode Option Tabs -->
-            <div class="checkout-payment-modes" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
-                <button type="button" class="pay-mode-btn" id="btn-mode-qr" onclick="selectPayMode('qr')" style="background: #0c2340; color: #fff; border-color: #0c2340;">
-                    <span>⚡</span> Instant UPI QR Code
+            <!-- Payment Mode Option Tabs: Exactly Two Options -->
+            <div class="checkout-payment-modes">
+                <button type="button" class="pay-mode-btn" id="btn-mode-qr" onclick="selectPayMode('qr')" style="background: #0c2340; color: #fff; border: 1.5px solid #0c2340; padding: 13px 16px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>⚡</span> UPI QR Code (Razorpay)
                 </button>
-                <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')">
-                    <span>💵</span> Cash on Delivery
-                </button>
-            </div>
-
-            <!-- MODE 1: QR Code -->
-            <div id="section-qr" style="text-align: center; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-                <div style="font-size: 13px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
-                    Scan QR Code to Pay
-                </div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading); margin-bottom: 14px;">
-                    ₹{{ "%.2f"|format(total_amount) }}
-                </div>
-
-                <!-- QR Code Box -->
-                <div style="display: inline-block; background: #ffffff; border: 1.5px solid var(--slate-200); border-radius: 14px; padding: 14px; box-shadow: var(--shadow-sm); margin-bottom: 12px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi%3A%2F%2Fpay%3Fpa%3D{{ store_upi_id }}%26pn%3DE-Commerce%2520Demo%26am%3D{{ total_amount }}%26cu%3DINR" 
-                         alt="Scan UPI QR Code" 
-                         width="180" height="180" 
-                         style="border-radius: 8px; display: block; margin: 0 auto; background: #fff;">
-                </div>
-
-                <div style="font-size: 12.5px; font-weight: 600; color: var(--slate-500); margin-bottom: 14px;">
-                    Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM &bull; Any UPI App
-                </div>
-
-                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 12px; margin-bottom: 18px; max-width: 440px; margin-left: auto; margin-right: auto; font-size: 13px; color: var(--slate-600); line-height: 1.45;">
-                    Scan using any UPI App on your mobile, complete the payment of <b>₹{{ "%.2f"|format(total_amount) }}</b>, and click confirm below.
-                </div>
-
-                <button type="button" id="btn-confirm-qr" onclick="submitQRPayment()" class="btn btn-primary" style="width: 100%; max-width: 440px; padding: 15px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #16a34a; border-color: #16a34a; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>✓</span> Confirm Payment &amp; Place Order &rarr;
+                <button type="button" class="pay-mode-btn" id="btn-mode-cod" onclick="selectPayMode('cod')" style="background: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1; padding: 13px 16px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>💵</span> Cash on Delivery (Unpaid)
                 </button>
             </div>
 
-            <!-- MODE 2: Cash on Delivery -->
-            <div id="section-cod" style="display: none; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                    <div style="width: 46px; height: 46px; border-radius: 12px; background: #ecfdf5; display: flex; align-items: center; justify-content: center; font-size: 22px;">💵</div>
-                    <div>
-                        <div style="font-size: 16px; font-weight: 800; color: var(--slate-900);">Cash on Delivery (COD)</div>
-                        <div style="font-size: 12.5px; color: var(--slate-500); margin-top: 2px;">Pay with cash or UPI when your parcel arrives at your doorstep.</div>
+            <!-- OPTION 1: Authentic Dynamic UPI QR Code via Razorpay -->
+            <div id="section-qr" style="border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px 22px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--slate-100); padding-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 22px;">⚡</div>
+                        <div>
+                            <div style="font-size: 16px; font-weight: 800; color: var(--slate-900);">Instant UPI QR Code Payment</div>
+                            <div style="font-size: 12px; color: var(--slate-500); margin-top: 2px;">
+                                Google Pay &bull; PhonePe &bull; Paytm &bull; BHIM &bull; Any UPI App
+                            </div>
+                        </div>
+                    </div>
+                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #047857; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #a7f3d0;">
+                        <span>🔒</span> Razorpay Verified Gateway
+                    </span>
+                </div>
+
+                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 12px; padding: 18px; margin-bottom: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 13.5px; color: var(--slate-600); font-weight: 600;">Total Payable Now:</span>
+                        <span style="font-size: 26px; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading);">₹{{ "%.2f"|format(total_amount) }}</span>
+                    </div>
+                    <div style="font-size: 12.5px; color: var(--slate-600); line-height: 1.5; border-top: 1px dashed var(--slate-200); padding-top: 10px; margin-top: 10px;">
+                        🔒 <b>Real-time Bank Verification:</b> Clicking the button below connects directly to Razorpay and opens your authentic dynamic UPI QR code on your screen. Scan and pay using any UPI app. Your order is confirmed <b>only after real payment is confirmed by your bank</b>.
                     </div>
                 </div>
 
-                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--slate-600); margin-bottom: 18px; line-height: 1.45;">
-                    Your invoice will record payment status as <b>Pending (COD)</b> until handed to the delivery courier.
+                <button type="button" id="launch-razorpay-btn" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #0c2340; border-color: #0c2340; color: #fff; box-shadow: 0 4px 14px rgba(12, 35, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                    <span>⚡</span> Open UPI QR Code &amp; Pay ₹{{ "%.2f"|format(total_amount) }} &rarr;
+                </button>
+            </div>
+
+            <!-- OPTION 2: Cash on Delivery (Unpaid until courier handover) -->
+            <div id="section-cod" style="display: none; border: 1.5px solid var(--slate-200); background: #ffffff; border-radius: 16px; padding: 26px 22px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: #ecfdf5; display: flex; align-items: center; justify-content: center; font-size: 22px;">💵</div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--slate-900);">Cash on Delivery (COD)</div>
+                        <div style="font-size: 12.5px; color: var(--slate-500); margin-top: 2px;">Pay with cash or UPI directly when your parcel arrives at your doorstep.</div>
+                    </div>
                 </div>
 
-                <button type="button" id="btn-confirm-cod" onclick="submitCODPayment()" class="btn btn-secondary" style="width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #0c2340; border-color: #0c2340; color: #fff; box-shadow: 0 4px 14px rgba(12, 35, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>📦</span> Confirm Order (Cash on Delivery) &rarr;
+                <div style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #9a3412; margin-bottom: 18px; line-height: 1.5;">
+                    ⚠️ <b>Payment Status:</b> Your order will be placed immediately, and your invoice will record the payment status as <b>UNPAID</b> (Amount Paid: ₹0.00). You will pay <b>₹{{ "%.2f"|format(total_amount) }}</b> upon parcel delivery.
+                </div>
+
+                <button type="button" id="btn-confirm-cod" onclick="submitCODPayment()" class="btn btn-secondary" style="width: 100%; padding: 16px; font-size: 16px; font-weight: 800; border-radius: 12px; background: #166534; border-color: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22, 101, 52, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                    <span>📦</span> Confirm Order (Pay ₹{{ "%.2f"|format(total_amount) }} in Cash upon Delivery) &rarr;
                 </button>
             </div>
         </form>
@@ -186,12 +188,16 @@
                 <div>
                     <b style="font-size: 12.5px; color: var(--slate-800); display: block; margin-bottom: 2px;">Bank-Grade Encrypted Transaction</b>
                     <p style="font-size: 11.5px; color: var(--slate-500); margin: 0; line-height: 1.4;">
-                        Every transaction is cryptographically verified via Razorpay HMAC SHA256 or NPCI bank UTR. GST Tax Invoice generated instantly.
+                        Real-time verification powered by Razorpay API. Cryptographic HMAC SHA256 bank signature validation on every online payment.
                     </p>
                 </div>
             </div>
         </div>
+    </div>
 </div>
+
+<!-- Official Razorpay Checkout JavaScript SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 var currentPayMode = 'qr';
@@ -200,6 +206,7 @@ function selectPayMode(mode) {
     currentPayMode = mode;
     var qrSec = document.getElementById('section-qr');
     var codSec = document.getElementById('section-cod');
+
     var qrBtn = document.getElementById('btn-mode-qr');
     var codBtn = document.getElementById('btn-mode-cod');
 
@@ -219,6 +226,7 @@ function selectPayMode(mode) {
             qrBtn.style.color = '#fff';
             qrBtn.style.borderColor = '#0c2340';
         }
+        document.getElementById('payment_method_input').value = 'UPI QR Code (Razorpay)';
     } else if (mode === 'cod') {
         if (codSec) codSec.style.display = 'block';
         if (codBtn) {
@@ -226,6 +234,7 @@ function selectPayMode(mode) {
             codBtn.style.color = '#fff';
             codBtn.style.borderColor = '#0c2340';
         }
+        document.getElementById('payment_method_input').value = 'Cash on Delivery';
     }
 }
 
@@ -245,31 +254,100 @@ function validateAddress() {
     return true;
 }
 
-// 1. Submit QR Code Payment
-function submitQRPayment() {
-    if (!validateAddress()) return;
+// 1. Launch Authentic Razorpay Dynamic UPI QR Code
+var launchBtn = document.getElementById('launch-razorpay-btn');
+if (launchBtn) {
+    launchBtn.onclick = async function(e) {
+        e.preventDefault();
+        if (!validateAddress()) return;
 
-    var btn = document.getElementById('btn-confirm-qr');
-    if (btn) {
+        var btn = this;
+        var origText = btn.innerHTML;
+        btn.innerHTML = '⏳ Generating UPI QR Code from Razorpay...';
         btn.disabled = true;
-        btn.innerHTML = '⏳ Confirming Payment &amp; Placing Order...';
-    }
 
-    var randHex = Math.random().toString(36).substring(2, 10).toUpperCase();
-    document.getElementById('payment_method_input').value = 'UPI QR Code';
-    document.getElementById('razorpay_payment_id').value = 'UPI-QR-' + randHex;
-    document.getElementById('upi_utr_input').value = randHex;
-    document.getElementById('checkout-form').submit();
+        try {
+            if (typeof Razorpay === 'undefined') {
+                alert('Razorpay Checkout SDK is not loaded. Please verify your internet connection or disable ad-blockers.');
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                return;
+            }
+
+            // Create authentic order on Razorpay servers
+            const res = await fetch('/create-razorpay-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (!data.success) {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                alert('Razorpay Connection Error: ' + (data.error || 'Failed to initialize order on Razorpay.'));
+                return;
+            }
+
+            var phoneInput = document.getElementById('phone_number');
+            var contactVal = phoneInput ? phoneInput.value.trim() : '';
+
+            var options = {
+                "key": data.key,
+                "amount": data.amount,
+                "currency": data.currency || "INR",
+                "name": "E-Commerce Demo",
+                "description": "Order Payment",
+                "order_id": data.order_id,
+                "handler": function (response) {
+                    btn.innerHTML = '⏳ Payment Received! Verifying &amp; Placing Order...';
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id_input').value = response.razorpay_order_id || data.order_id;
+                    document.getElementById('razorpay_signature_input').value = response.razorpay_signature || '';
+                    document.getElementById('payment_method_input').value = 'UPI QR Code (Razorpay)';
+                    document.getElementById('checkout-form').submit();
+                },
+                "prefill": {
+                    "name": "{{ customer.first_name or '' }} {{ customer.last_name or '' }}".trim(),
+                    "email": "{{ customer.e_mail or customer.email or '' }}",
+                    "contact": contactVal,
+                    "method": "upi"
+                },
+                "theme": {
+                    "color": "#0c2340"
+                },
+                "modal": {
+                    "ondismiss": function() {
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                    }
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(resp) {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                var errMsg = resp.error ? (resp.error.description || resp.error.reason) : 'Payment failed';
+                alert('Razorpay Payment Failed: ' + errMsg);
+            });
+            rzp.open();
+
+        } catch (err) {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            alert('Error connecting to Razorpay: ' + err.message);
+        }
+    };
 }
 
-// 2. Submit Cash on Delivery Payment
+// 2. Submit Cash on Delivery Payment (Unpaid until delivery)
 function submitCODPayment() {
     if (!validateAddress()) return;
 
     var btn = document.getElementById('btn-confirm-cod');
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '⏳ Confirming Order...';
+        btn.innerHTML = '⏳ Confirming Order (Cash on Delivery)...';
     }
 
     var randHex = Math.random().toString(36).substring(2, 10).toUpperCase();

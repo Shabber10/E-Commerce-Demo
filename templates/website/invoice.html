@@ -357,13 +357,14 @@
             <div>
                 <div class="section-title">Payment &amp; Verification</div>
                 <div class="details-content">
-                    <strong>Method:</strong> {{ payment.payment_method if payment else 'Online Payment' }}<br>
-                    <strong>Status:</strong> <span class="status-pill">{{ (payment.payment_status if payment else 'Completed')|upper }}</span><br>
-                    {% if payment and 'UPI-UTR-' in payment.transaction_id %}
-                        <strong>Bank UTR Ref:</strong> <span style="font-family: monospace; font-weight: 700; color: #166534;">{{ payment.transaction_id.replace('UPI-UTR-', '') }}</span><br>
+                    <strong>Method:</strong> {{ payment.payment_method if payment else 'Cash on Delivery' }}<br>
+                    <strong>Payment Status:</strong> 
+                    {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+                        <span class="status-pill" style="background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; font-weight: 800;">UNPAID (CASH ON DELIVERY)</span><br>
                     {% else %}
-                        <strong>Transaction ID:</strong> <span style="font-family: monospace;">{{ payment.transaction_id if payment else 'N/A' }}</span><br>
+                        <span class="status-pill" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 800;">PAID (ONLINE VERIFIED)</span><br>
                     {% endif %}
+                    <strong>Transaction ID:</strong> <span style="font-family: monospace;">{{ payment.transaction_id if payment else 'N/A' }}</span><br>
                     <strong>Timestamp:</strong> {{ payment.payment_date.strftime('%d-%m-%Y %H:%M') if payment and payment.payment_date else '' }}
                 </div>
             </div>
@@ -412,10 +413,21 @@
                     <span>CGST + SGST (0% included):</span>
                     <span>₹0.00</span>
                 </div>
-                <div class="summary-row final">
-                    <span>Total Amount Paid:</span>
-                    <span style="color: var(--primary);">₹{{ "%.2f"|format(order.total_amount) }}</span>
-                </div>
+                {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+                    <div class="summary-row" style="color: #ea580c; font-weight: 700;">
+                        <span>Amount Paid Now:</span>
+                        <span>₹0.00</span>
+                    </div>
+                    <div class="summary-row final" style="color: #dc2626; border-top: 2px solid #fecaca; margin-top: 6px; padding-top: 10px;">
+                        <span>Balance Due on Delivery:</span>
+                        <span style="color: #dc2626;">₹{{ "%.2f"|format(order.total_amount) }}</span>
+                    </div>
+                {% else %}
+                    <div class="summary-row final">
+                        <span>Total Amount Paid:</span>
+                        <span style="color: var(--primary);">₹{{ "%.2f"|format(payment.amount_paid if payment and payment.amount_paid else order.total_amount) }}</span>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
