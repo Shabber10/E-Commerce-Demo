@@ -3,7 +3,43 @@
 {% block title %}Order Confirmed Successfully - E-Commerce Demo{% endblock %}
 
 {% block content %}
-<div style="max-width: 620px; margin: 36px auto; background-color: #ffffff; border: 1px solid var(--slate-200); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); padding: 36px 32px; text-align: center;">
+<style>
+    .order-success-card {
+        max-width: 620px;
+        width: 100%;
+        margin: 36px auto;
+        background-color: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-lg);
+        padding: 36px 32px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    .order-success-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 640px) {
+        .order-success-card {
+            margin: 16px auto !important;
+            padding: 24px 16px !important;
+            border-radius: 16px !important;
+        }
+        .order-success-actions {
+            flex-direction: column !important;
+        }
+        .order-success-actions .btn {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+    }
+</style>
+
+<div class="order-success-card">
     
     <!-- Success Icon Circle -->
     <div style="width: 68px; height: 68px; border-radius: 50%; background: #ecfdf5; color: #10b981; border: 2px solid #a7f3d0; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3);">
@@ -98,7 +134,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+    <div class="order-success-actions" style="margin-bottom: 20px;">
         <a href="{{ url_for('download_invoice', order_id=order.order_id) }}" class="btn btn-primary" style="height: 44px; padding: 0 20px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span>Download Invoice (PDF)</span>
