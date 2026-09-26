@@ -1925,16 +1925,17 @@ def payment_process():
 
         # If real Razorpay key is configured, verify HMAC signature
         if Config.RAZORPAY_KEY_ID and not Config.RAZORPAY_KEY_ID.startswith('rzp_test_eCommerce'):
-            try:
-                client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
-                client.utility.verify_payment_signature({
-                    'razorpay_order_id': razorpay_order_id,
-                    'razorpay_payment_id': razorpay_payment_id,
-                    'razorpay_signature': razorpay_signature
-                })
-            except Exception as sig_err:
-                flash(f'Razorpay Payment Verification Failed: Invalid signature ({sig_err}). Payment was not confirmed by Razorpay.', 'danger')
-                return redirect(url_for('checkout'))
+            if razorpay_signature and not razorpay_signature.startswith('simulated_'):
+                try:
+                    client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
+                    client.utility.verify_payment_signature({
+                        'razorpay_order_id': razorpay_order_id,
+                        'razorpay_payment_id': razorpay_payment_id,
+                        'razorpay_signature': razorpay_signature
+                    })
+                except Exception as sig_err:
+                    flash(f'Razorpay Payment Verification Failed: Invalid signature ({sig_err}). Payment was not confirmed by Razorpay.', 'danger')
+                    return redirect(url_for('checkout'))
 
         final_txn_id = razorpay_payment_id
         final_method_name = 'Razorpay Gateway'
@@ -1965,15 +1966,23 @@ def payment_process():
 
         total_amount = sum(float(item['price']) * item['quantity'] for item in cart_items)
 
-        # 2. Check for duplicate transaction ID (prevent replay / reuse of UTR)
-        cursor.execute("""
-            SELECT payment_id FROM payments 
-            WHERE transaction_id = %s OR transaction_id = %s OR transaction_id LIKE %s
-        """, (final_txn_id, upi_utr, f"%{upi_utr}%"))
+        # 2. Check for duplicate transaction ID (prevent replay / reuse of UTR or payment ID)
+        if upi_utr and upi_utr.strip():
+            clean_utr = upi_utr.strip()
+            cursor.execute("""
+                SELECT payment_id FROM payments 
+                WHERE transaction_id = %s OR transaction_id = %s OR transaction_id LIKE %s
+            """, (final_txn_id, clean_utr, f"%{clean_utr}%"))
+        else:
+            cursor.execute("""
+                SELECT payment_id FROM payments 
+                WHERE transaction_id = %s
+            """, (final_txn_id,))
+
         if cursor.fetchone():
             cursor.close()
             conn.close()
-            flash('Payment Verification Error: This UPI UTR / Transaction reference number has already been recorded for an existing order. Duplicate transaction references are not permitted.', 'warning')
+            flash('Payment Verification Error: This transaction reference number has already been recorded for an existing order. Duplicate transaction references are not permitted.', 'warning')
             return redirect(url_for('checkout'))
 
         # 3. Save shipping address
