@@ -12,15 +12,25 @@
         </svg>
     </div>
 
-    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: #ecfdf5; color: #065f46; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px;">
-        Payment Verified &amp; Confirmed
+    {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 9999px; background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; border: 1px solid #fde68a;">
+        💵 Cash On Delivery &bull; Payment Unpaid
     </div>
+    {% else %}
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 9999px; background: #ecfdf5; color: #065f46; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; border: 1px solid #a7f3d0;">
+        ⚡ Payment Verified &amp; Confirmed (Razorpay)
+    </div>
+    {% endif %}
 
     <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
         Order Placed Successfully!
     </h1>
     <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">
-        Thank you for your purchase. We've dispatched your confirmation and your order is being prepared.
+        {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+        Thank you for your purchase. Please keep <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong> ready in cash to pay upon delivery.
+        {% else %}
+        Thank you for your purchase. Your payment was verified securely and your order is being prepared.
+        {% endif %}
     </p>
 
     <!-- Receipt Details Card -->
@@ -42,6 +52,15 @@
             <span style="font-weight: 600; color: #0f172a;">{{ payment.payment_method if payment else 'Online Payment' }}</span>
         </div>
 
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13.5px;">
+            <span style="color: #64748b;">Payment Status:</span>
+            {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+            <span style="font-weight: 700; color: #dc2626; background: #fee2e2; padding: 2px 8px; border-radius: 4px; font-size: 12px;">UNPAID (Pay on Delivery)</span>
+            {% else %}
+            <span style="font-weight: 700; color: #059669; background: #ecfdf5; padding: 2px 8px; border-radius: 4px; font-size: 12px;">PAID &amp; VERIFIED</span>
+            {% endif %}
+        </div>
+
         {% if payment and 'UPI-UTR-' in payment.transaction_id %}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13.5px;">
                 <span style="color: #64748b;">Bank Reference (UTR):</span>
@@ -61,10 +80,21 @@
             </span>
         </div>
 
+        {% if payment and payment.payment_status in ['pending', 'unpaid'] %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed var(--slate-200); font-size: 14px;">
+            <span style="color: #64748b;">Amount Paid Now:</span>
+            <span style="font-weight: 700; color: #dc2626;">₹0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 16px;">
+            <span style="font-weight: 700; color: #0f172a;">Balance Due at Delivery:</span>
+            <span style="font-size: 20px; font-weight: 800; color: #b45309;">₹{{ "%.2f"|format(order.total_amount) }}</span>
+        </div>
+        {% else %}
         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 12px; border-top: 1.5px dashed var(--slate-200); font-size: 16px;">
             <span style="font-weight: 700; color: #0f172a;">Total Paid Amount:</span>
-            <span style="font-size: 20px; font-weight: 800; color: #0f172a;">₹{{ "%.2f"|format(order.total_amount) }}</span>
+            <span style="font-size: 20px; font-weight: 800; color: #059669;">₹{{ "%.2f"|format(order.total_amount) }}</span>
         </div>
+        {% endif %}
     </div>
 
     <!-- Action Buttons -->

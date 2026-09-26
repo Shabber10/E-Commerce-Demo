@@ -1900,45 +1900,39 @@ def payment_process():
     razorpay_signature = request.form.get('razorpay_signature', '').strip()
     upi_utr = request.form.get('upi_utr', '').strip()
 
-    # Strict Validation of Payment - NO BYPASS!
-    payment_status = 'completed'
-    final_txn_id = None
-    final_method_name = payment_method
+    # STRICT PAYMENT LOGIC - ONLY TWO OPTIONS:
+    # 1. Cash on Delivery (COD) -> Directly confirmed, marked UNPAID, amount_paid = 0.0
+    # 2. UPI QR Code / Online Payment (Razorpay) -> Strictly verified with Razorpay HMAC signature, marked COMPLETED, amount_paid = total_amount
 
-    if 'UPI' in payment_method or 'QR' in payment_method:
-        # UPI QR Code Payment
-        txn_suffix = upi_utr if (upi_utr and len(upi_utr) >= 6) else uuid.uuid4().hex[:10].upper()
-        final_txn_id = f"UPI-QR-{txn_suffix}"
-        final_method_name = f"UPI QR Code ({Config.STORE_UPI_ID})"
-        payment_status = 'completed'
-
-    elif 'Cash on Delivery' in payment_method or payment_method == 'COD':
-        final_txn_id = f"COD-PENDING-{uuid.uuid4().hex[:8].upper()}"
+    if 'Cash on Delivery' in payment_method or payment_method == 'COD':
+        final_txn_id = f"COD-UNPAID-{uuid.uuid4().hex[:8].upper()}"
         final_method_name = "Cash on Delivery"
-        payment_status = 'pending'
+        payment_status = 'unpaid'
 
     else:
-        # Official Razorpay Gateway
-        if not razorpay_payment_id:
-            flash('Payment Failed: No payment was completed. Transaction cancelled.', 'danger')
+        # UPI QR Code / Razorpay Online Payment - MUST BE AUTHENTICATED
+        if not razorpay_payment_id or not razorpay_payment_id.startswith('pay_'):
+            flash('Payment Required: No payment was completed through Razorpay. Your order has not been placed.', 'danger')
             return redirect(url_for('checkout'))
 
-        # If real Razorpay key is configured, verify HMAC signature
+        # Strictly verify cryptographic HMAC signature with Razorpay client
         if Config.RAZORPAY_KEY_ID and not Config.RAZORPAY_KEY_ID.startswith('rzp_test_eCommerce'):
-            if razorpay_signature and not razorpay_signature.startswith('simulated_'):
-                try:
-                    client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
-                    client.utility.verify_payment_signature({
-                        'razorpay_order_id': razorpay_order_id,
-                        'razorpay_payment_id': razorpay_payment_id,
-                        'razorpay_signature': razorpay_signature
-                    })
-                except Exception as sig_err:
-                    flash(f'Razorpay Payment Verification Failed: Invalid signature ({sig_err}). Payment was not confirmed by Razorpay.', 'danger')
-                    return redirect(url_for('checkout'))
+            if not razorpay_signature:
+                flash('Payment Verification Error: Missing cryptographic payment signature from Razorpay.', 'danger')
+                return redirect(url_for('checkout'))
+            try:
+                client = razorpay.Client(auth=(Config.RAZORPAY_KEY_ID, Config.RAZORPAY_KEY_SECRET))
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                })
+            except Exception as sig_err:
+                flash(f'Payment Verification Failed: Invalid payment signature from bank ({sig_err}). Order cannot be placed without verified bank payment.', 'danger')
+                return redirect(url_for('checkout'))
 
         final_txn_id = razorpay_payment_id
-        final_method_name = 'Razorpay Gateway'
+        final_method_name = 'UPI QR Code (Razorpay)'
         payment_status = 'completed'
 
     conn = db_connection()
@@ -1965,19 +1959,13 @@ def payment_process():
             return redirect(url_for('index'))
 
         total_amount = sum(float(item['price']) * item['quantity'] for item in cart_items)
+        actual_amount_paid = 0.0 if payment_status == 'unpaid' else total_amount
 
-        # 2. Check for duplicate transaction ID (prevent replay / reuse of UTR or payment ID)
-        if upi_utr and upi_utr.strip():
-            clean_utr = upi_utr.strip()
-            cursor.execute("""
-                SELECT payment_id FROM payments 
-                WHERE transaction_id = %s OR transaction_id = %s OR transaction_id LIKE %s
-            """, (final_txn_id, clean_utr, f"%{clean_utr}%"))
-        else:
-            cursor.execute("""
-                SELECT payment_id FROM payments 
-                WHERE transaction_id = %s
-            """, (final_txn_id,))
+        # 2. Check for duplicate transaction ID (prevent replay)
+        cursor.execute("""
+            SELECT payment_id FROM payments 
+            WHERE transaction_id = %s
+        """, (final_txn_id,))
 
         if cursor.fetchone():
             cursor.close()
@@ -2020,11 +2008,11 @@ def payment_process():
                 WHERE product_id = %s
             """, (item['quantity'], item['product_id']))
 
-        # 6. Insert payment record
+        # 6. Insert payment record (amount_paid is 0.0 for COD unpaid, full total for paid Razorpay)
         cursor.execute("""
             INSERT INTO payments (order_id, payment_method, payment_status, amount_paid, transaction_id)
             VALUES (%s, %s, %s, %s, %s)
-        """, (order_id, final_method_name, payment_status, total_amount, final_txn_id))
+        """, (order_id, final_method_name, payment_status, actual_amount_paid, final_txn_id))
 
         # 7. Insert shipment tracking record
         tracking_num = f"TRK-{uuid.uuid4().hex[:8].upper()}"
@@ -2040,7 +2028,10 @@ def payment_process():
         cursor.close()
         conn.close()
 
-        flash(f'Payment confirmed ({final_txn_id})! Your order #{order_id} has been placed successfully.', 'success')
+        if payment_status == 'unpaid':
+            flash(f'Order #{order_id} placed successfully with Cash on Delivery! Total payable upon arrival: ₹{"%.2f" % total_amount}.', 'info')
+        else:
+            flash(f'Payment confirmed via Razorpay ({final_txn_id})! Your order #{order_id} has been placed successfully.', 'success')
         return redirect(url_for('order_success', order_id=order_id))
 
     except Exception as err:
